@@ -30,8 +30,12 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
     {
         yield return new PluginPageInfo
         {
-            Name = Name,
-            EmbeddedResourcePath = $"{GetType().Namespace}.Pages.SourceManager.html"
+            Name = "SourceManager",
+            DisplayName = Name,
+            EmbeddedResourcePath = $"{GetType().Namespace}.Pages.SourceManager.html",
+            EnableInMainMenu = true,
+            MenuSection = "plugins",
+            MenuIcon = "folder"
         };
     }
 }
