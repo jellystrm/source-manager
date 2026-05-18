@@ -1,9 +1,9 @@
 using System.Globalization;
-using Jellyfin.Plugin.Jellystrm.Models;
+using Jellyfin.Plugin.SourceManager.Models;
 using MediaBrowser.Common.Configuration;
 using Microsoft.Data.Sqlite;
 
-namespace Jellyfin.Plugin.Jellystrm.Services;
+namespace Jellyfin.Plugin.SourceManager.Services;
 
 public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
 {
@@ -13,7 +13,7 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
 
     public SqliteRequestRepository(IApplicationPaths applicationPaths)
     {
-        var dataPath = Path.Combine(applicationPaths.DataPath, "jellystrm");
+        var dataPath = Path.Combine(applicationPaths.DataPath, "source-manager");
         Directory.CreateDirectory(dataPath);
 
         var connectionStringBuilder = new SqliteConnectionStringBuilder

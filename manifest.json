@@ -1,12 +1,20 @@
 [
   {
     "guid": "b0e976c7-b9e6-4a30-93d9-0a7858c6dd96",
-    "name": "Jellystrm",
-    "description": "Request workflow, source resolution, and managed STRM library support for Jellystrm clients.",
-    "overview": "Jellystrm client companion plugin for request state, SSE updates, and managed stream-library sources.",
+    "name": "Source Manager",
+    "description": "Request workflow, source resolution, and managed STRM library support for Source Manager clients.",
+    "overview": "Source Manager client companion plugin for request state, SSE updates, and managed stream-library sources.",
     "owner": "jellystrm",
     "category": "General",
     "versions": [
+      {
+        "version": "1.0.2.0",
+        "changelog": "- See the full changelog at [GitHub](https://github.com/jellystrm/source-manager/releases/tag/1.0.2.0)\n",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/jellystrm/source-manager/releases/download/1.0.2.0/source-manager-1.0.2.0.zip",
+        "checksum": "970c71440f434aa26b1dbfd3e74fecb2",
+        "timestamp": "2026-05-18T08:03:18Z"
+      },
       {
         "version": "1.0.1.0",
         "changelog": "- See the full changelog at [GitHub](https://github.com/jellystrm/source-manager/releases/tag/1.0.1.0)\n",

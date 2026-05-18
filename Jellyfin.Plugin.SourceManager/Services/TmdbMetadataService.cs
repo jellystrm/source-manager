@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
-using Jellyfin.Plugin.Jellystrm.Models;
+using Jellyfin.Plugin.SourceManager.Models;
 
-namespace Jellyfin.Plugin.Jellystrm.Services;
+namespace Jellyfin.Plugin.SourceManager.Services;
 
 public sealed class TmdbMetadataService
 {

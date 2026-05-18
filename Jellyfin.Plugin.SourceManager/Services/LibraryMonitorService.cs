@@ -2,7 +2,7 @@ using MediaBrowser.Controller.Library;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.Jellystrm.Services;
+namespace Jellyfin.Plugin.SourceManager.Services;
 
 public sealed class LibraryMonitorService : IHostedService, IDisposable
 {
@@ -67,7 +67,7 @@ public sealed class LibraryMonitorService : IHostedService, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to process Jellystrm library item update for {ItemId}", e.Item?.Id);
+            _logger.LogError(ex, "Failed to process Source Manager library item update for {ItemId}", e.Item?.Id);
         }
     }
 }

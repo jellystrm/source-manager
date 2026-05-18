@@ -1,8 +1,8 @@
 using System.Globalization;
-using Jellyfin.Plugin.Jellystrm.Models;
+using Jellyfin.Plugin.SourceManager.Models;
 using MediaBrowser.Controller.Library;
 
-namespace Jellyfin.Plugin.Jellystrm.Services;
+namespace Jellyfin.Plugin.SourceManager.Services;
 
 public sealed class RequestWorkflowService
 {

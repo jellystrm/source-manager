@@ -49,7 +49,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if gh release view "${{ inputs.version }}" >/dev/null 2>&1; then
-            gh release upload "${{ inputs.version }}" "dist/jellystrm-${{ inputs.version }}.zip" --clobber
+            gh release upload "${{ inputs.version }}" "dist/source-manager-${{ inputs.version }}.zip" --clobber
           else
-            gh release create "${{ inputs.version }}" "dist/jellystrm-${{ inputs.version }}.zip" --generate-notes
+            gh release create "${{ inputs.version }}" "dist/source-manager-${{ inputs.version }}.zip" --generate-notes
           fi

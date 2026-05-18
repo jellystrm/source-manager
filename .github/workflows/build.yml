@@ -18,7 +18,7 @@ jobs:
           dotnet-version: 9.0.x
 
       - name: Restore
-        run: dotnet restore Jellyfin.Plugin.Jellystrm.sln
+        run: dotnet restore Jellyfin.Plugin.SourceManager.sln
 
       - name: Build
-        run: dotnet build Jellyfin.Plugin.Jellystrm.sln --configuration Release --no-restore
+        run: dotnet build Jellyfin.Plugin.SourceManager.sln --configuration Release --no-restore

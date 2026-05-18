@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace Jellyfin.Plugin.Jellystrm.Support;
+namespace Jellyfin.Plugin.SourceManager.Support;
 
 public static class JellyfinClaimsPrincipalExtensions
 {

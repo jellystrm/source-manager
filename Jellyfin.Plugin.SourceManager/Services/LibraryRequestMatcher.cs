@@ -1,11 +1,11 @@
-using Jellyfin.Plugin.Jellystrm.Models;
+using Jellyfin.Plugin.SourceManager.Models;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Entities;
 
-namespace Jellyfin.Plugin.Jellystrm.Services;
+namespace Jellyfin.Plugin.SourceManager.Services;
 
 public sealed class LibraryRequestMatcher
 {

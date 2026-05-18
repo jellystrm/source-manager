@@ -1,9 +1,9 @@
-using Jellyfin.Plugin.Jellystrm.Services;
+using Jellyfin.Plugin.SourceManager.Services;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Jellyfin.Plugin.Jellystrm;
+namespace Jellyfin.Plugin.SourceManager;
 
 public class PluginServiceRegistrator : IPluginServiceRegistrator
 {

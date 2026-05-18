@@ -1,7 +1,7 @@
-using Jellyfin.Plugin.Jellystrm.Models;
+using Jellyfin.Plugin.SourceManager.Models;
 using MediaBrowser.Controller.Entities;
 
-namespace Jellyfin.Plugin.Jellystrm.Services;
+namespace Jellyfin.Plugin.SourceManager.Services;
 
 public interface IRequestRepository
 {

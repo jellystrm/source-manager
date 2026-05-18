@@ -3,7 +3,7 @@ const fs = require("fs");
 
 const repository = process.env.GITHUB_REPO || "jellystrm/source-manager";
 const version = process.env.VERSION || "1.0.0.0";
-const file = process.env.FILE || `jellystrm-${version}.zip`;
+const file = process.env.FILE || `source-manager-${version}.zip`;
 const targetAbi = process.env.TARGET_ABI || "10.11.0.0";
 const manifestPath = "./manifest.json";
 const zipPath = `./dist/${file}`;

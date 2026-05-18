@@ -1,4 +1,4 @@
-namespace Jellyfin.Plugin.Jellystrm.Support;
+namespace Jellyfin.Plugin.SourceManager.Support;
 
 public static class JellyfinAuthorizationPolicies
 {

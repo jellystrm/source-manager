@@ -1,33 +1,36 @@
-name: "Jellystrm"
+name: "Source Manager"
 guid: "b0e976c7-b9e6-4a30-93d9-0a7858c6dd96"
-version: "1.0.1.0"
+version: "1.0.2.0"
 targetAbi: "10.11.0.0"
 framework: "net9.0"
 owner: "jellystrm"
 category: "General"
-overview: "Request workflow, source resolution, and managed STRM library support for Jellystrm clients."
+overview: "Request workflow, source resolution, and managed STRM library support for Source Manager clients."
 description: >
-  Jellystrm accepts authenticated Jellystrm client requests,
+  Source Manager accepts authenticated Source Manager client requests,
   lets Jellyfin admins approve or reject them, persists request state in a
   plugin-owned SQLite database, emits request updates over SSE, and maps
   approved requests to Jellyfin items by TMDB provider IDs. Future source
   provider support manages stream URLs and STRM files inside configured
   Jellyfin library folders.
 artifacts:
-  - "Jellyfin.Plugin.Jellystrm.dll"
-  - "Jellyfin.Plugin.Jellystrm.deps.json"
+  - "Jellyfin.Plugin.SourceManager.dll"
+  - "Jellyfin.Plugin.SourceManager.deps.json"
   - "Microsoft.Data.Sqlite.dll"
   - "SQLitePCLRaw.core.dll"
   - "SQLitePCLRaw.provider.e_sqlite3.dll"
   - "SQLitePCLRaw.batteries_v2.dll"
   - "runtimes/**"
 changelog: |
+  ## 1.0.2.0
+  - Renames the Jellyfin catalog and dashboard display name to Source Manager.
+
   ## 1.0.1.0
-  - Adds a Jellyfin dashboard plugin page so Jellystrm appears in the Plugins sidebar.
+  - Adds a Jellyfin dashboard plugin page so Source Manager appears in the Plugins sidebar.
 
   ## 1.0.0.0
   - Initial request workflow plugin.
-  - Adds authenticated Jellystrm request APIs.
+  - Adds authenticated Source Manager request APIs.
   - Adds admin approve/reject/refresh APIs.
   - Adds plugin-owned SQLite persistence.
   - Adds SSE request status updates.

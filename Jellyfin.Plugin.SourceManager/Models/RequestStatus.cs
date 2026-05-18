@@ -1,4 +1,4 @@
-namespace Jellyfin.Plugin.Jellystrm.Models;
+namespace Jellyfin.Plugin.SourceManager.Models;
 
 public static class RequestStatus
 {

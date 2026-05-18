@@ -1,8 +1,8 @@
 export VERSION ?= 1.0.0.0
 export GITHUB_REPO ?= jellystrm/source-manager
-export PROJECT := Jellyfin.Plugin.Jellystrm
+export PROJECT := Jellyfin.Plugin.SourceManager
 export FRAMEWORK := net9.0
-export FILE := jellystrm-${VERSION}.zip
+export FILE := source-manager-${VERSION}.zip
 
 .PHONY: print clean restore build publish zip csum update-manifest release
 

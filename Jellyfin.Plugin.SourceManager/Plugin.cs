@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Jellyfin.Plugin.Jellystrm.Configuration;
+using Jellyfin.Plugin.SourceManager.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
 
-namespace Jellyfin.Plugin.Jellystrm;
+namespace Jellyfin.Plugin.SourceManager;
 
 public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
 {
@@ -20,18 +20,18 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
 
     public override Guid Id => Guid.Parse("b0e976c7-b9e6-4a30-93d9-0a7858c6dd96");
 
-    public override string Name => "Jellystrm";
+    public override string Name => "Source Manager";
 
-    public override string Description => "Resolves Jellystrm client requests and manages Jellyfin stream sources.";
+    public override string Description => "Resolves Source Manager client requests and manages Jellyfin stream sources.";
 
-    public override string ConfigurationFileName => "Jellyfin.Plugin.Jellystrm.xml";
+    public override string ConfigurationFileName => "Jellyfin.Plugin.SourceManager.xml";
 
     public IEnumerable<PluginPageInfo> GetPages()
     {
         yield return new PluginPageInfo
         {
             Name = Name,
-            EmbeddedResourcePath = $"{GetType().Namespace}.Pages.Jellystrm.html"
+            EmbeddedResourcePath = $"{GetType().Namespace}.Pages.SourceManager.html"
         };
     }
 }

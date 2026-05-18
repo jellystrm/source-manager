@@ -1,27 +1,27 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using System.Text.Json;
-using Jellyfin.Plugin.Jellystrm.Models;
-using Jellyfin.Plugin.Jellystrm.Services;
-using Jellyfin.Plugin.Jellystrm.Support;
+using Jellyfin.Plugin.SourceManager.Models;
+using Jellyfin.Plugin.SourceManager.Services;
+using Jellyfin.Plugin.SourceManager.Support;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Jellyfin.Plugin.Jellystrm.Controllers;
+namespace Jellyfin.Plugin.SourceManager.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("Jellystrm")]
+[Route("SourceManager")]
 [Produces(MediaTypeNames.Application.Json)]
-public sealed class JellystrmController : ControllerBase
+public sealed class SourceManagerController : ControllerBase
 {
     private static readonly JsonSerializerOptions SseJsonOptions = new(JsonSerializerDefaults.Web);
 
     private readonly RequestWorkflowService _requestWorkflowService;
     private readonly RequestEventBroker _eventBroker;
 
-    public JellystrmController(RequestWorkflowService requestWorkflowService, RequestEventBroker eventBroker)
+    public SourceManagerController(RequestWorkflowService requestWorkflowService, RequestEventBroker eventBroker)
     {
         _requestWorkflowService = requestWorkflowService;
         _eventBroker = eventBroker;
