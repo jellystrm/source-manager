@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <AssemblyName>Jellyfin.Plugin.SourceManager</AssemblyName>
     <RootNamespace>Jellyfin.Plugin.SourceManager</RootNamespace>
-    <Version>1.0.11.0</Version>
+    <Version>1.0.12.0</Version>
     <Authors>Jellystrm</Authors>
     <RepositoryUrl>https://github.com/jellystrm/source-manager</RepositoryUrl>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
