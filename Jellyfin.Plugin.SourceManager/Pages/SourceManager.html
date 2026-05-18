@@ -1,457 +1,272 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Source Manager</title>
     <style>
-        #SourceManagerConfigPage {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #101010;
-            color: #ddd;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .sm-content {
-            max-width: 640px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem 4rem;
-        }
-        .sm-header {
+        /* Scoped cosmetic styles only — no page/background/layout overrides,
+           so the page inherits the active Jellyfin theme and stays inside
+           the dashboard shell. */
+        #SourceManagerConfigPage .sm-copy-row {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid #2a2a2a;
-            padding-bottom: 1.25rem;
+            gap: .5em;
+            padding: .5em .75em;
+            margin: .25em 0 .75em;
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: .25em;
+            background: rgba(255, 255, 255, .04);
         }
-        .sm-header-icon {
-            width: 40px;
-            height: 40px;
-            background: #00a4dc;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .sm-header-icon svg {
-            width: 22px;
-            height: 22px;
-            fill: #fff;
-        }
-        .sm-header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #fff;
-        }
-        .sm-header p {
-            margin: 2px 0 0;
-            font-size: 0.82rem;
-            color: #888;
-        }
-        .sm-badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 2rem;
-        }
-        .sm-badge {
-            background: #1e1e1e;
-            border: 1px solid #2e2e2e;
-            border-radius: 20px;
-            padding: 3px 10px;
-            font-size: 0.75rem;
-            color: #aaa;
-        }
-        .sm-badge.blue { border-color: #00a4dc33; color: #00a4dc; background: #00a4dc10; }
-        .sm-section {
-            background: #181818;
-            border: 1px solid #2a2a2a;
-            border-radius: 10px;
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 1.25rem;
-        }
-        .sm-section-title {
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: #00a4dc;
-            margin: 0 0 1rem;
-        }
-        .sm-field {
-            margin-bottom: 1rem;
-        }
-        .sm-field:last-child { margin-bottom: 0; }
-        .sm-label {
-            display: block;
-            font-size: 0.82rem;
-            font-weight: 500;
-            color: #bbb;
-            margin-bottom: 5px;
-        }
-        .sm-input {
-            width: 100%;
-            box-sizing: border-box;
-            background: #101010;
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #eee;
-            font-size: 0.88rem;
-            padding: 9px 12px;
-            outline: none;
-            transition: border-color 0.15s;
-        }
-        .sm-input:focus { border-color: #00a4dc; }
-        .sm-input::placeholder { color: #555; }
-        .sm-hint {
-            margin-top: 5px;
-            font-size: 0.76rem;
-            color: #666;
-            line-height: 1.4;
-        }
-        .sm-hint code {
-            background: #222;
-            border-radius: 3px;
-            padding: 1px 5px;
-            font-size: 0.72rem;
-            color: #aaa;
-        }
-        .sm-info {
-            background: #00a4dc0d;
-            border: 1px solid #00a4dc22;
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            margin-bottom: 1rem;
-            font-size: 0.8rem;
-            color: #aaa;
-            line-height: 1.5;
-        }
-        .sm-info strong { color: #00a4dc; }
-        .sm-lib-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 0;
-            border-bottom: 1px solid #222;
-            font-size: 0.8rem;
-        }
-        .sm-lib-row:last-child { border-bottom: none; }
-        .sm-lib-path { color: #aaa; font-family: monospace; font-size: 0.76rem; }
-        .sm-lib-arrow { color: #555; }
-        .sm-lib-type { color: #00a4dc; font-weight: 600; font-size: 0.75rem; }
-        .sm-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 1.5rem;
-        }
-        .sm-btn {
-            background: #00a4dc;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 10px 28px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-        .sm-btn:hover { background: #0090c4; }
-        .sm-version { font-size: 0.72rem; color: #444; }
-        .sm-copy-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #101010;
-            border: 1px solid #333;
-            border-radius: 6px;
-            padding: 8px 12px;
-            margin-bottom: 10px;
-        }
-        .sm-copy-row code {
+        #SourceManagerConfigPage .sm-copy-row code {
             flex: 1;
-            font-size: 0.82rem;
-            color: #eee;
             word-break: break-all;
-            background: none;
+            font-size: .85em;
         }
-        .sm-copy-btn {
-            background: #222;
-            border: 1px solid #444;
-            border-radius: 4px;
-            color: #aaa;
-            font-size: 0.72rem;
-            padding: 3px 8px;
-            cursor: pointer;
-            flex-shrink: 0;
-            transition: background 0.15s;
-        }
-        .sm-copy-btn:hover { background: #333; color: #eee; }
-        .sm-step {
+        #SourceManagerConfigPage .sm-step {
             display: flex;
-            gap: 10px;
-            padding: 6px 0;
-            font-size: 0.8rem;
-            color: #aaa;
-            border-bottom: 1px solid #222;
-            line-height: 1.4;
+            gap: .6em;
+            padding: .35em 0;
+            line-height: 1.45;
         }
-        .sm-step:last-child { border-bottom: none; }
-        .sm-step-num {
-            width: 20px;
-            height: 20px;
+        #SourceManagerConfigPage .sm-step-num {
+            flex-shrink: 0;
+            width: 1.5em;
+            height: 1.5em;
             border-radius: 50%;
-            background: #00a4dc20;
-            border: 1px solid #00a4dc44;
-            color: #00a4dc;
-            font-size: 0.7rem;
-            font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
-            margin-top: 1px;
+            font-size: .8em;
+            font-weight: 700;
+            background: rgba(0, 164, 220, .15);
+            color: #00a4dc;
         }
-        .sm-key-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
+        #SourceManagerConfigPage .sm-pill {
+            display: inline-block;
+            margin: 0 .3em .4em 0;
+            padding: .15em .65em;
+            border-radius: 1em;
+            font-size: .78em;
+            background: rgba(0, 164, 220, .12);
+            color: #00a4dc;
         }
-        .sm-key-label { font-size: 0.78rem; color: #888; width: 60px; flex-shrink: 0; }
-        .sm-key-val { font-family: monospace; font-size: 0.78rem; color: #ccc; flex: 1; word-break: break-all; }
+        #SourceManagerConfigPage code {
+            background: rgba(255, 255, 255, .08);
+            border-radius: .2em;
+            padding: .05em .35em;
+        }
     </style>
 </head>
 <body>
-    <div id="SourceManagerConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-button,emby-input">
-        <div data-role="content">
-            <div class="content-primary sm-content">
+<div id="SourceManagerConfigPage" data-role="page" class="page type-interior pluginConfigurationPage"
+     data-require="emby-input,emby-button,emby-checkbox,emby-select">
+    <div data-role="content">
+        <div class="content-primary">
 
-                <div class="sm-header">
-                    <div class="sm-header-icon">
-                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-                    </div>
-                    <div>
-                        <h1>Source Manager</h1>
-                        <p>Jellyfin plugin — request workflow &amp; stream library</p>
+            <form id="SourceManagerConfigForm" class="esqContent">
+
+                <div class="verticalSection verticalSection-extrabottompadding">
+                    <h2 class="sectionTitle">Source Manager</h2>
+                    <p class="fieldDescription" style="margin-top:-.5em;">
+                        Request workflow &amp; managed .strm stream library.
+                    </p>
+                    <div style="margin-top:.75em;">
+                        <span class="sm-pill">GET /SourceManager/Capabilities</span>
+                        <span class="sm-pill">POST /SourceManager/Request</span>
+                        <span class="sm-pill">SSE /Requests/Events</span>
+                        <span class="sm-pill">Admin approve / reject / refresh</span>
                     </div>
                 </div>
 
-                <div class="sm-badges">
-                    <span class="sm-badge blue">GET /SourceManager/Capabilities</span>
-                    <span class="sm-badge blue">POST /SourceManager/Request</span>
-                    <span class="sm-badge blue">GET /SourceManager/Requests</span>
-                    <span class="sm-badge blue">SSE /Requests/Events</span>
-                    <span class="sm-badge">Admin approve / reject / refresh</span>
+                <!-- TMDB -->
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">TMDB</h2>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="TmdbApiKey">API key (optional)</label>
+                        <input is="emby-input" type="text" id="TmdbApiKey" name="TmdbApiKey"
+                               autocomplete="off" />
+                        <div class="fieldDescription">Leave blank to use the built-in key. Override if you hit TMDB rate limits.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="TmdbPosterSize">Poster size</label>
+                        <input is="emby-input" type="text" id="TmdbPosterSize" name="TmdbPosterSize" />
+                        <div class="fieldDescription">TMDB image width: <code>w185</code> <code>w342</code> <code>w500</code> <code>original</code></div>
+                    </div>
                 </div>
 
-                <form id="SourceManagerConfigForm">
+                <!-- Library paths -->
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">Library paths</h2>
+                    <p class="fieldDescription">
+                        Source Manager writes <code>.strm</code> files directly into the library folders
+                        Jellyfin already scans. Leave blank to auto-discover from Jellyfin virtual folders;
+                        set only if auto-discovery picks the wrong folder.
+                    </p>
 
-                    <!-- TMDB -->
-                    <div class="sm-section">
-                        <div class="sm-section-title">TMDB</div>
-
-                        <div class="sm-field">
-                            <label class="sm-label" for="TmdbApiKey">API Key <span style="color:#555;font-weight:400">(optional)</span></label>
-                            <input id="TmdbApiKey" name="TmdbApiKey" type="text" class="sm-input emby-input" is="emby-input" placeholder="Leave blank to use the built-in key" autocomplete="off" />
-                            <div class="sm-hint">Override if you hit TMDB rate limits.</div>
-                        </div>
-
-                        <div class="sm-field">
-                            <label class="sm-label" for="TmdbPosterSize">Poster size</label>
-                            <input id="TmdbPosterSize" name="TmdbPosterSize" type="text" class="sm-input emby-input" is="emby-input" placeholder="w500" />
-                            <div class="sm-hint">TMDB image width: <code>w185</code> <code>w342</code> <code>w500</code> <code>original</code></div>
-                        </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="MovieLibraryPath">Movies library path (optional override)</label>
+                        <input is="emby-input" type="text" id="MovieLibraryPath" name="MovieLibraryPath" />
+                        <div class="fieldDescription">Root folder of your Jellyfin Movies library, e.g. <code>/media/movies</code></div>
                     </div>
 
-                    <!-- Library paths -->
-                    <div class="sm-section">
-                        <div class="sm-section-title">Library paths</div>
-
-                        <div class="sm-info">
-                            Source Manager writes <code>.strm</code> files directly into the library folders Jellyfin is already scanning.<br>
-                            <strong>Leave blank</strong> to auto-discover from Jellyfin virtual folders. Set only if auto-discovery picks the wrong folder.
-                        </div>
-
-                        <div class="sm-field">
-                            <label class="sm-label" for="MovieLibraryPath">Movies library path <span style="color:#555;font-weight:400">(optional override)</span></label>
-                            <input id="MovieLibraryPath" name="MovieLibraryPath" type="text" class="sm-input emby-input" is="emby-input" placeholder="auto-detected" />
-                            <div class="sm-hint">Root folder of your Jellyfin Movies library, e.g. <code>/media/movies</code></div>
-                        </div>
-
-                        <div class="sm-field">
-                            <label class="sm-label" for="ShowLibraryPath">TV Shows library path <span style="color:#555;font-weight:400">(optional override)</span></label>
-                            <input id="ShowLibraryPath" name="ShowLibraryPath" type="text" class="sm-input emby-input" is="emby-input" placeholder="auto-detected" />
-                            <div class="sm-hint">Root folder of your Jellyfin TV Shows library, e.g. <code>/media/shows</code></div>
-                        </div>
-
-                        <div class="sm-info" style="margin-top:0.5rem;margin-bottom:0;">
-                            Files are written as:<br>
-                            <code>Movies/{Title}/{Title}.strm</code><br>
-                            <code>Shows/{Title}/Season NN/{Title} - SNNENN.strm</code>
-                        </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="ShowLibraryPath">TV Shows library path (optional override)</label>
+                        <input is="emby-input" type="text" id="ShowLibraryPath" name="ShowLibraryPath" />
+                        <div class="fieldDescription">Root folder of your Jellyfin TV Shows library, e.g. <code>/media/shows</code></div>
                     </div>
 
-                    <!-- Auto Source Resolution -->
-                    <div class="sm-section">
-                        <div class="sm-section-title">Auto Source Resolution</div>
+                    <p class="fieldDescription">
+                        Files are written as
+                        <code>Movies/{Title}/{Title}.strm</code> and
+                        <code>Shows/{Title}/Season NN/{Title} - SNNENN.strm</code>.
+                    </p>
+                </div>
 
-                        <div class="sm-info">
-                            Khi Jellyseerr approve một request, Source Manager tự động tìm stream theo thứ tự:<br>
-                            <strong>KKPhim</strong> → <strong>OPhim</strong> (m3u8 → .strm) → <strong>YTS</strong> (torrent → qBittorrent)
-                        </div>
+                <!-- Auto Source Resolution -->
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">Auto source resolution</h2>
+                    <p class="fieldDescription">
+                        Khi Jellyseerr approve một request, Source Manager tự tìm stream theo thứ tự:
+                        <strong>KKPhim</strong> → <strong>OPhim</strong> (m3u8 → .strm) →
+                        <strong>YTS</strong> (torrent → qBittorrent).
+                    </p>
 
-                        <div class="sm-field" style="display:flex;align-items:center;gap:10px;">
-                            <input id="EnableAutoResolution" name="EnableAutoResolution" type="checkbox" style="width:auto;margin:0;" />
-                            <label class="sm-label" for="EnableAutoResolution" style="margin:0;">Enable auto resolution</label>
-                        </div>
+                    <label class="emby-checkbox-label">
+                        <input is="emby-checkbox" type="checkbox" id="EnableAutoResolution" name="EnableAutoResolution" />
+                        <span>Enable auto resolution</span>
+                    </label>
 
-                        <div class="sm-field">
-                            <label class="sm-label" for="QBittorrentUrl">qBittorrent URL <span style="color:#555;font-weight:400">(optional)</span></label>
-                            <input id="QBittorrentUrl" name="QBittorrentUrl" type="text" class="sm-input emby-input" is="emby-input" placeholder="http://localhost:8080" />
-                            <div class="sm-hint">Leave blank to disable torrent fallback.</div>
-                        </div>
-
-                        <div class="sm-field">
-                            <label class="sm-label" for="QBittorrentUsername">qBittorrent username</label>
-                            <input id="QBittorrentUsername" name="QBittorrentUsername" type="text" class="sm-input emby-input" is="emby-input" placeholder="admin" />
-                        </div>
-
-                        <div class="sm-field">
-                            <label class="sm-label" for="QBittorrentPassword">qBittorrent password</label>
-                            <input id="QBittorrentPassword" name="QBittorrentPassword" type="password" class="sm-input emby-input" is="emby-input" autocomplete="off" />
-                        </div>
+                    <div class="inputContainer" style="margin-top:1em;">
+                        <label class="inputLabel inputLabelUnfocused" for="QBittorrentUrl">qBittorrent URL (optional)</label>
+                        <input is="emby-input" type="text" id="QBittorrentUrl" name="QBittorrentUrl" />
+                        <div class="fieldDescription">Leave blank to disable torrent fallback. e.g. <code>http://localhost:8080</code></div>
                     </div>
 
-                    <!-- Jellyseerr Integration -->
-                    <div class="sm-section">
-                        <div class="sm-section-title">Jellyseerr Integration</div>
-
-                        <div class="sm-info">
-                            Thêm Source Manager như một <strong>Radarr</strong> (phim) và <strong>Sonarr</strong> (series) instance trong Jellyseerr.<br>
-                            Khi admin approve request, Jellyseerr gửi thẳng vào Source Manager thay vì Radarr/Sonarr thật.
-                        </div>
-
-                        <!-- Radarr (movies) -->
-                        <div style="margin-bottom:1.25rem;">
-                            <div class="sm-hint" style="font-weight:600;color:#bbb;margin-bottom:8px;">Radarr — Movies</div>
-                            <div class="sm-hint" style="margin-bottom:6px;">URL</div>
-                            <div class="sm-copy-row">
-                                <code id="smRadarrUrl">http://&lt;jellyfin-host&gt;:8096/SourceManager/radarr</code>
-                                <button class="sm-copy-btn" onclick="smCopy('smRadarrUrl')">Copy</button>
-                            </div>
-                            <div class="sm-hint" style="margin-bottom:6px;">API Key</div>
-                            <div class="sm-copy-row">
-                                <code id="smRadarrKey">loading…</code>
-                                <button class="sm-copy-btn" onclick="smCopy('smRadarrKey')">Copy</button>
-                            </div>
-                        </div>
-
-                        <!-- Sonarr (series) -->
-                        <div style="margin-bottom:1.25rem;">
-                            <div class="sm-hint" style="font-weight:600;color:#bbb;margin-bottom:8px;">Sonarr — TV Series</div>
-                            <div class="sm-hint" style="margin-bottom:6px;">URL</div>
-                            <div class="sm-copy-row">
-                                <code id="smSonarrUrl">http://&lt;jellyfin-host&gt;:8096/SourceManager/sonarr</code>
-                                <button class="sm-copy-btn" onclick="smCopy('smSonarrUrl')">Copy</button>
-                            </div>
-                            <div class="sm-hint" style="margin-bottom:6px;">API Key</div>
-                            <div class="sm-copy-row">
-                                <code id="smSonarrKey">loading…</code>
-                                <button class="sm-copy-btn" onclick="smCopy('smSonarrKey')">Copy</button>
-                            </div>
-                        </div>
-
-                        <div style="margin-bottom:0.5rem;">
-                            <div class="sm-hint" style="margin-bottom:8px;">Cách cài trong Jellyseerr:</div>
-                            <div class="sm-step">
-                                <div class="sm-step-num">1</div>
-                                <div>Settings → Services → Radarr → <strong>Add Radarr Server</strong> → dán Radarr URL và API Key ở trên</div>
-                            </div>
-                            <div class="sm-step">
-                                <div class="sm-step-num">2</div>
-                                <div>Quality Profile → <strong>Source Manager</strong> · Root Folder → thư mục <strong>movies</strong></div>
-                            </div>
-                            <div class="sm-step">
-                                <div class="sm-step-num">3</div>
-                                <div>Settings → Services → Sonarr → <strong>Add Sonarr Server</strong> → dán Sonarr URL và API Key ở trên</div>
-                            </div>
-                            <div class="sm-step">
-                                <div class="sm-step-num">4</div>
-                                <div>Quality Profile → <strong>Source Manager</strong> · Language Profile → <strong>Any</strong> · Root Folder → thư mục <strong>shows</strong></div>
-                            </div>
-                            <div class="sm-step">
-                                <div class="sm-step-num">5</div>
-                                <div>Test Connection → Save (cả hai)</div>
-                            </div>
-                        </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="QBittorrentUsername">qBittorrent username</label>
+                        <input is="emby-input" type="text" id="QBittorrentUsername" name="QBittorrentUsername" />
                     </div>
 
-                    <div class="sm-footer">
-                        <span class="sm-version">v1.0.8.0</span>
-                        <button id="smSaveBtn" is="emby-button" type="submit" class="sm-btn raised button-submit emby-button">Save</button>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="QBittorrentPassword">qBittorrent password</label>
+                        <input is="emby-input" type="password" id="QBittorrentPassword" name="QBittorrentPassword"
+                               autocomplete="off" />
+                    </div>
+                </div>
+
+                <!-- Jellyseerr Integration -->
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">Jellyseerr integration</h2>
+                    <p class="fieldDescription">
+                        Thêm Source Manager như một <strong>Radarr</strong> (phim) và
+                        <strong>Sonarr</strong> (series) instance trong Jellyseerr. Khi admin approve,
+                        Jellyseerr gửi thẳng vào Source Manager thay vì Radarr/Sonarr thật.
+                    </p>
+
+                    <h3 class="checkboxListLabel" style="margin-top:1em;">Radarr — Movies</h3>
+                    <div class="fieldDescription">URL</div>
+                    <div class="sm-copy-row">
+                        <code id="smRadarrUrl">http://&lt;jellyfin-host&gt;:8096/SourceManager/radarr</code>
+                        <button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smRadarrUrl">Copy</button>
+                    </div>
+                    <div class="fieldDescription">API key</div>
+                    <div class="sm-copy-row">
+                        <code id="smRadarrKey">loading…</code>
+                        <button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smRadarrKey">Copy</button>
                     </div>
 
-                </form>
-            </div>
+                    <h3 class="checkboxListLabel" style="margin-top:1.25em;">Sonarr — TV Series</h3>
+                    <div class="fieldDescription">URL</div>
+                    <div class="sm-copy-row">
+                        <code id="smSonarrUrl">http://&lt;jellyfin-host&gt;:8096/SourceManager/sonarr</code>
+                        <button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smSonarrUrl">Copy</button>
+                    </div>
+                    <div class="fieldDescription">API key</div>
+                    <div class="sm-copy-row">
+                        <code id="smSonarrKey">loading…</code>
+                        <button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smSonarrKey">Copy</button>
+                    </div>
+
+                    <h3 class="checkboxListLabel" style="margin-top:1.25em;">Cách cài trong Jellyseerr</h3>
+                    <div class="sm-step"><div class="sm-step-num">1</div><div>Settings → Services → Radarr → <strong>Add Radarr Server</strong> → dán Radarr URL và API key ở trên</div></div>
+                    <div class="sm-step"><div class="sm-step-num">2</div><div>Quality Profile → <strong>Source Manager</strong> · Root Folder → thư mục <strong>movies</strong></div></div>
+                    <div class="sm-step"><div class="sm-step-num">3</div><div>Settings → Services → Sonarr → <strong>Add Sonarr Server</strong> → dán Sonarr URL và API key ở trên</div></div>
+                    <div class="sm-step"><div class="sm-step-num">4</div><div>Quality Profile → <strong>Source Manager</strong> · Language Profile → <strong>Any</strong> · Root Folder → thư mục <strong>shows</strong></div></div>
+                    <div class="sm-step"><div class="sm-step-num">5</div><div>Test Connection → Save (cả hai)</div></div>
+                </div>
+
+                <div class="verticalSection">
+                    <button is="emby-button" type="submit" class="raised button-submit block">
+                        <span>Save</span>
+                    </button>
+                    <p class="fieldDescription" style="text-align:center;margin-top:.75em;">Source Manager v1.0.10.0</p>
+                </div>
+
+            </form>
         </div>
-
-        <script type="text/javascript">
-            (function () {
-                var pluginId = "b0e976c7-b9e6-4a30-93d9-0a7858c6dd96";
-
-                window.smCopy = function (elementId) {
-                var text = document.getElementById(elementId).textContent;
-                navigator.clipboard.writeText(text).then(function () {
-                    var btn = document.querySelector('[onclick="smCopy(\'' + elementId + '\')"]');
-                    if (btn) { btn.textContent = "Copied!"; setTimeout(function () { btn.textContent = "Copy"; }, 1500); }
-                });
-            };
-
-                document.getElementById("SourceManagerConfigPage").addEventListener("pageshow", function () {
-                    if (typeof ApiClient === "undefined") { return; }
-                    ApiClient.getPluginConfiguration(pluginId).then(function (config) {
-                        document.getElementById("TmdbApiKey").value = config.TmdbApiKey || "";
-                        document.getElementById("TmdbPosterSize").value = config.TmdbPosterSize || "w500";
-                        document.getElementById("MovieLibraryPath").value = config.MovieLibraryPath || "";
-                        document.getElementById("ShowLibraryPath").value = config.ShowLibraryPath || "";
-                        document.getElementById("EnableAutoResolution").checked = config.EnableAutoResolution !== false;
-                        document.getElementById("QBittorrentUrl").value = config.QBittorrentUrl || "";
-                        document.getElementById("QBittorrentUsername").value = config.QBittorrentUsername || "admin";
-                        document.getElementById("QBittorrentPassword").value = config.QBittorrentPassword || "";
-
-                        var host = window.location.origin;
-                        if (config.RadarrApiKey) {
-                            document.getElementById("smRadarrKey").textContent = config.RadarrApiKey;
-                        }
-                        document.getElementById("smRadarrUrl").textContent = host + "/SourceManager/radarr";
-                        if (config.SonarrApiKey) {
-                            document.getElementById("smSonarrKey").textContent = config.SonarrApiKey;
-                        }
-                        document.getElementById("smSonarrUrl").textContent = host + "/SourceManager/sonarr";
-                    });
-                });
-
-                document.getElementById("SourceManagerConfigForm").addEventListener("submit", function (e) {
-                    e.preventDefault();
-                    if (typeof ApiClient === "undefined") { return; }
-                    ApiClient.getPluginConfiguration(pluginId).then(function (config) {
-                        config.TmdbApiKey = document.getElementById("TmdbApiKey").value.trim() || null;
-                        config.TmdbPosterSize = document.getElementById("TmdbPosterSize").value.trim() || "w500";
-                        config.MovieLibraryPath = document.getElementById("MovieLibraryPath").value.trim() || null;
-                        config.ShowLibraryPath = document.getElementById("ShowLibraryPath").value.trim() || null;
-                        config.EnableAutoResolution = document.getElementById("EnableAutoResolution").checked;
-                        config.QBittorrentUrl = document.getElementById("QBittorrentUrl").value.trim() || null;
-                        config.QBittorrentUsername = document.getElementById("QBittorrentUsername").value.trim() || "admin";
-                        config.QBittorrentPassword = document.getElementById("QBittorrentPassword").value || null;
-                        ApiClient.updatePluginConfiguration(pluginId, config).then(function () {
-                            Dashboard.processPluginConfigurationUpdateResult();
-                        });
-                    });
-                });
-            })();
-        </script>
     </div>
+
+    <script type="text/javascript">
+        (function () {
+            var pluginId = "b0e976c7-b9e6-4a30-93d9-0a7858c6dd96";
+            var page = document.getElementById("SourceManagerConfigPage");
+
+            function copyText(id, btn) {
+                var text = document.getElementById(id).textContent;
+                navigator.clipboard.writeText(text).then(function () {
+                    var label = btn.querySelector("span") || btn;
+                    var old = label.textContent;
+                    label.textContent = "Copied!";
+                    setTimeout(function () { label.textContent = old; }, 1500);
+                });
+            }
+
+            page.addEventListener("click", function (e) {
+                var btn = e.target.closest("[data-copy]");
+                if (btn) { copyText(btn.getAttribute("data-copy"), btn); }
+            });
+
+            page.addEventListener("pageshow", function () {
+                if (typeof ApiClient === "undefined") { return; }
+                ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                    page.querySelector("#TmdbApiKey").value = config.TmdbApiKey || "";
+                    page.querySelector("#TmdbPosterSize").value = config.TmdbPosterSize || "w500";
+                    page.querySelector("#MovieLibraryPath").value = config.MovieLibraryPath || "";
+                    page.querySelector("#ShowLibraryPath").value = config.ShowLibraryPath || "";
+                    page.querySelector("#EnableAutoResolution").checked = config.EnableAutoResolution !== false;
+                    page.querySelector("#QBittorrentUrl").value = config.QBittorrentUrl || "";
+                    page.querySelector("#QBittorrentUsername").value = config.QBittorrentUsername || "admin";
+                    page.querySelector("#QBittorrentPassword").value = config.QBittorrentPassword || "";
+
+                    var host = window.location.origin;
+                    page.querySelector("#smRadarrUrl").textContent = host + "/SourceManager/radarr";
+                    page.querySelector("#smSonarrUrl").textContent = host + "/SourceManager/sonarr";
+                    if (config.RadarrApiKey) { page.querySelector("#smRadarrKey").textContent = config.RadarrApiKey; }
+                    if (config.SonarrApiKey) { page.querySelector("#smSonarrKey").textContent = config.SonarrApiKey; }
+                });
+            });
+
+            page.querySelector("#SourceManagerConfigForm").addEventListener("submit", function (e) {
+                e.preventDefault();
+                if (typeof ApiClient === "undefined") { return false; }
+                ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                    config.TmdbApiKey = page.querySelector("#TmdbApiKey").value.trim() || null;
+                    config.TmdbPosterSize = page.querySelector("#TmdbPosterSize").value.trim() || "w500";
+                    config.MovieLibraryPath = page.querySelector("#MovieLibraryPath").value.trim() || null;
+                    config.ShowLibraryPath = page.querySelector("#ShowLibraryPath").value.trim() || null;
+                    config.EnableAutoResolution = page.querySelector("#EnableAutoResolution").checked;
+                    config.QBittorrentUrl = page.querySelector("#QBittorrentUrl").value.trim() || null;
+                    config.QBittorrentUsername = page.querySelector("#QBittorrentUsername").value.trim() || "admin";
+                    config.QBittorrentPassword = page.querySelector("#QBittorrentPassword").value || null;
+                    ApiClient.updatePluginConfiguration(pluginId, config).then(function () {
+                        Dashboard.processPluginConfigurationUpdateResult();
+                    });
+                });
+                return false;
+            });
+        })();
+    </script>
+</div>
 </body>
 </html>
