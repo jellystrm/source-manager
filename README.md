@@ -45,7 +45,7 @@ The plugin configuration is stored by Jellyfin in the normal plugin configuratio
 Add this repository URL in Jellyfin Dashboard -> Plugins -> Repositories:
 
 ```text
-https://raw.githubusercontent.com/jellystrm/source-manager/main/manifest.json
+https://raw.githubusercontent.com/jellystrm/plugins/main/manifest.json
 ```
 
 That URL loads this plugin catalog. Each manifest entry points Jellyfin to the matching GitHub release ZIP, for example `jellystrm-1.0.0.0.zip`.

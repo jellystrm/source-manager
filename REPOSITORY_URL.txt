@@ -1,1 +1,1 @@
-https://raw.githubusercontent.com/jellystrm/source-manager/main/manifest.json
+https://raw.githubusercontent.com/jellystrm/plugins/main/manifest.json
