@@ -1,6 +1,6 @@
 name: "Source Manager"
 guid: "b0e976c7-b9e6-4a30-93d9-0a7858c6dd96"
-version: "1.0.5.0"
+version: "1.0.6.0"
 targetAbi: "10.11.0.0"
 framework: "net9.0"
 owner: "jellystrm"
@@ -23,6 +23,18 @@ artifacts:
   - "SQLitePCLRaw.batteries_v2.dll"
   - "runtimes/**"
 changelog: |
+  ## 1.0.6.0
+  - Adds Sonarr-compatible API at /SourceManager/sonarr for TV series requests.
+    Jellyseerr can now point to Source Manager as both a Radarr instance (movies)
+    and a Sonarr instance (series) — no real Radarr or Sonarr required.
+  - Adds SonarrApiKey plugin setting (auto-generated, shown in dashboard).
+  - Series are identified by TVDB ID; stored alongside movie requests in the
+    same SQLite table with media_type = 'series'.
+  - Sonarr endpoints: system/status, qualityProfile, languageProfile, rootfolder,
+    tag, series/lookup, series (CRUD), command, episode, episodefile.
+  - Updates dashboard Jellyseerr section to show both Radarr and Sonarr
+    URLs and API keys with copy buttons and a 5-step setup guide.
+
   ## 1.0.5.0
   - Adds Jellyseerr integration: Source Manager now exposes a Radarr-compatible
     API at /SourceManager/radarr so Jellyseerr can point to it instead of a real

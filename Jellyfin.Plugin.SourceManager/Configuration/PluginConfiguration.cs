@@ -16,11 +16,16 @@ public class PluginConfiguration : BasePluginConfiguration
     public string? StrmLibraryPath { get; set; }
 
     /// <summary>
-    /// API key for the Radarr-compatible endpoint.
-    /// In Jellyseerr: set this value as the Radarr API key,
-    /// and use http://&lt;host&gt;:8096/SourceManager/radarr as the Radarr URL.
+    /// API key for the Radarr-compatible endpoint (movies).
+    /// In Jellyseerr: use http://&lt;host&gt;:8096/SourceManager/radarr as the Radarr URL.
     /// </summary>
     public string RadarrApiKey { get; set; } = GenerateKey();
+
+    /// <summary>
+    /// API key for the Sonarr-compatible endpoint (TV series).
+    /// In Jellyseerr: use http://&lt;host&gt;:8096/SourceManager/sonarr as the Sonarr URL.
+    /// </summary>
+    public string SonarrApiKey { get; set; } = GenerateKey();
 
     private static string GenerateKey()
         => Guid.NewGuid().ToString("N");

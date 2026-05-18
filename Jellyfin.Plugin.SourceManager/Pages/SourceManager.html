@@ -299,12 +299,14 @@
                         <div class="sm-section-title">Jellyseerr Integration</div>
 
                         <div class="sm-info">
-                            Thêm Source Manager như một <strong>Radarr instance</strong> trong Jellyseerr.<br>
-                            Khi admin approve request, Jellyseerr sẽ gửi thẳng vào Source Manager thay vì Radarr thật.
+                            Thêm Source Manager như một <strong>Radarr</strong> (phim) và <strong>Sonarr</strong> (series) instance trong Jellyseerr.<br>
+                            Khi admin approve request, Jellyseerr gửi thẳng vào Source Manager thay vì Radarr/Sonarr thật.
                         </div>
 
-                        <div style="margin-bottom:1rem;">
-                            <div class="sm-hint" style="margin-bottom:6px;">Radarr URL</div>
+                        <!-- Radarr (movies) -->
+                        <div style="margin-bottom:1.25rem;">
+                            <div class="sm-hint" style="font-weight:600;color:#bbb;margin-bottom:8px;">Radarr — Movies</div>
+                            <div class="sm-hint" style="margin-bottom:6px;">URL</div>
                             <div class="sm-copy-row">
                                 <code id="smRadarrUrl">http://&lt;jellyfin-host&gt;:8096/SourceManager/radarr</code>
                                 <button class="sm-copy-btn" onclick="smCopy('smRadarrUrl')">Copy</button>
@@ -316,33 +318,48 @@
                             </div>
                         </div>
 
+                        <!-- Sonarr (series) -->
+                        <div style="margin-bottom:1.25rem;">
+                            <div class="sm-hint" style="font-weight:600;color:#bbb;margin-bottom:8px;">Sonarr — TV Series</div>
+                            <div class="sm-hint" style="margin-bottom:6px;">URL</div>
+                            <div class="sm-copy-row">
+                                <code id="smSonarrUrl">http://&lt;jellyfin-host&gt;:8096/SourceManager/sonarr</code>
+                                <button class="sm-copy-btn" onclick="smCopy('smSonarrUrl')">Copy</button>
+                            </div>
+                            <div class="sm-hint" style="margin-bottom:6px;">API Key</div>
+                            <div class="sm-copy-row">
+                                <code id="smSonarrKey">loading…</code>
+                                <button class="sm-copy-btn" onclick="smCopy('smSonarrKey')">Copy</button>
+                            </div>
+                        </div>
+
                         <div style="margin-bottom:0.5rem;">
                             <div class="sm-hint" style="margin-bottom:8px;">Cách cài trong Jellyseerr:</div>
                             <div class="sm-step">
                                 <div class="sm-step-num">1</div>
-                                <div>Settings → Services → Radarr → <strong>Add Radarr Server</strong></div>
+                                <div>Settings → Services → Radarr → <strong>Add Radarr Server</strong> → dán Radarr URL và API Key ở trên</div>
                             </div>
                             <div class="sm-step">
                                 <div class="sm-step-num">2</div>
-                                <div>Dán <strong>Radarr URL</strong> và <strong>API Key</strong> ở trên vào</div>
+                                <div>Quality Profile → <strong>Source Manager</strong> · Root Folder → thư mục <strong>movies</strong></div>
                             </div>
                             <div class="sm-step">
                                 <div class="sm-step-num">3</div>
-                                <div>Quality Profile → chọn <strong>Source Manager</strong></div>
+                                <div>Settings → Services → Sonarr → <strong>Add Sonarr Server</strong> → dán Sonarr URL và API Key ở trên</div>
                             </div>
                             <div class="sm-step">
                                 <div class="sm-step-num">4</div>
-                                <div>Root Folder → chọn thư mục <strong>movies</strong> trong STRM library path</div>
+                                <div>Quality Profile → <strong>Source Manager</strong> · Language Profile → <strong>Any</strong> · Root Folder → thư mục <strong>shows</strong></div>
                             </div>
                             <div class="sm-step">
                                 <div class="sm-step-num">5</div>
-                                <div>Test Connection → Save</div>
+                                <div>Test Connection → Save (cả hai)</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="sm-footer">
-                        <span class="sm-version">v1.0.5.0</span>
+                        <span class="sm-version">v1.0.6.0</span>
                         <button id="smSaveBtn" is="emby-button" type="submit" class="sm-btn raised button-submit emby-button">Save</button>
                     </div>
 
@@ -378,12 +395,15 @@
                         document.getElementById("StrmLibraryPath").value = config.StrmLibraryPath || "";
                         updateLibPaths();
 
-                        // Show Radarr API key and URL
+                        var host = window.location.origin;
                         if (config.RadarrApiKey) {
                             document.getElementById("smRadarrKey").textContent = config.RadarrApiKey;
                         }
-                        var host = window.location.origin;
                         document.getElementById("smRadarrUrl").textContent = host + "/SourceManager/radarr";
+                        if (config.SonarrApiKey) {
+                            document.getElementById("smSonarrKey").textContent = config.SonarrApiKey;
+                        }
+                        document.getElementById("smSonarrUrl").textContent = host + "/SourceManager/sonarr";
                     });
                 });
 
