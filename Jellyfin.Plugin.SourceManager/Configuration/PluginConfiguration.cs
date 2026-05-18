@@ -14,4 +14,14 @@ public class PluginConfiguration : BasePluginConfiguration
     /// Add those sub-paths as separate Jellyfin libraries (Movies / TV Shows).
     /// </summary>
     public string? StrmLibraryPath { get; set; }
+
+    /// <summary>
+    /// API key for the Radarr-compatible endpoint.
+    /// In Jellyseerr: set this value as the Radarr API key,
+    /// and use http://&lt;host&gt;:8096/SourceManager/radarr as the Radarr URL.
+    /// </summary>
+    public string RadarrApiKey { get; set; } = GenerateKey();
+
+    private static string GenerateKey()
+        => Guid.NewGuid().ToString("N");
 }

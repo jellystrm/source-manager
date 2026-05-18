@@ -159,6 +159,68 @@
         }
         .sm-btn:hover { background: #0090c4; }
         .sm-version { font-size: 0.72rem; color: #444; }
+        .sm-copy-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #101010;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+        }
+        .sm-copy-row code {
+            flex: 1;
+            font-size: 0.82rem;
+            color: #eee;
+            word-break: break-all;
+            background: none;
+        }
+        .sm-copy-btn {
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #aaa;
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.15s;
+        }
+        .sm-copy-btn:hover { background: #333; color: #eee; }
+        .sm-step {
+            display: flex;
+            gap: 10px;
+            padding: 6px 0;
+            font-size: 0.8rem;
+            color: #aaa;
+            border-bottom: 1px solid #222;
+            line-height: 1.4;
+        }
+        .sm-step:last-child { border-bottom: none; }
+        .sm-step-num {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00a4dc20;
+            border: 1px solid #00a4dc44;
+            color: #00a4dc;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .sm-key-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .sm-key-label { font-size: 0.78rem; color: #888; width: 60px; flex-shrink: 0; }
+        .sm-key-val { font-family: monospace; font-size: 0.78rem; color: #ccc; flex: 1; word-break: break-all; }
     </style>
 </head>
 <body>
@@ -232,8 +294,55 @@
                         </div>
                     </div>
 
+                    <!-- Jellyseerr Integration -->
+                    <div class="sm-section">
+                        <div class="sm-section-title">Jellyseerr Integration</div>
+
+                        <div class="sm-info">
+                            Thêm Source Manager như một <strong>Radarr instance</strong> trong Jellyseerr.<br>
+                            Khi admin approve request, Jellyseerr sẽ gửi thẳng vào Source Manager thay vì Radarr thật.
+                        </div>
+
+                        <div style="margin-bottom:1rem;">
+                            <div class="sm-hint" style="margin-bottom:6px;">Radarr URL</div>
+                            <div class="sm-copy-row">
+                                <code id="smRadarrUrl">http://&lt;jellyfin-host&gt;:8096/SourceManager/radarr</code>
+                                <button class="sm-copy-btn" onclick="smCopy('smRadarrUrl')">Copy</button>
+                            </div>
+                            <div class="sm-hint" style="margin-bottom:6px;">API Key</div>
+                            <div class="sm-copy-row">
+                                <code id="smRadarrKey">loading…</code>
+                                <button class="sm-copy-btn" onclick="smCopy('smRadarrKey')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:0.5rem;">
+                            <div class="sm-hint" style="margin-bottom:8px;">Cách cài trong Jellyseerr:</div>
+                            <div class="sm-step">
+                                <div class="sm-step-num">1</div>
+                                <div>Settings → Services → Radarr → <strong>Add Radarr Server</strong></div>
+                            </div>
+                            <div class="sm-step">
+                                <div class="sm-step-num">2</div>
+                                <div>Dán <strong>Radarr URL</strong> và <strong>API Key</strong> ở trên vào</div>
+                            </div>
+                            <div class="sm-step">
+                                <div class="sm-step-num">3</div>
+                                <div>Quality Profile → chọn <strong>Source Manager</strong></div>
+                            </div>
+                            <div class="sm-step">
+                                <div class="sm-step-num">4</div>
+                                <div>Root Folder → chọn thư mục <strong>movies</strong> trong STRM library path</div>
+                            </div>
+                            <div class="sm-step">
+                                <div class="sm-step-num">5</div>
+                                <div>Test Connection → Save</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="sm-footer">
-                        <span class="sm-version">v1.0.4.0</span>
+                        <span class="sm-version">v1.0.5.0</span>
                         <button id="smSaveBtn" is="emby-button" type="submit" class="sm-btn raised button-submit emby-button">Save</button>
                     </div>
 
@@ -251,7 +360,15 @@
                     document.getElementById("smPathShows").textContent = base + "/shows";
                 }
 
-                document.getElementById("StrmLibraryPath").addEventListener("input", updateLibPaths);
+                window.smCopy = function (elementId) {
+                var text = document.getElementById(elementId).textContent;
+                navigator.clipboard.writeText(text).then(function () {
+                    var btn = document.querySelector('[onclick="smCopy(\'' + elementId + '\')"]');
+                    if (btn) { btn.textContent = "Copied!"; setTimeout(function () { btn.textContent = "Copy"; }, 1500); }
+                });
+            };
+
+            document.getElementById("StrmLibraryPath").addEventListener("input", updateLibPaths);
 
                 document.getElementById("SourceManagerConfigPage").addEventListener("pageshow", function () {
                     if (typeof ApiClient === "undefined") { return; }
@@ -260,6 +377,13 @@
                         document.getElementById("TmdbPosterSize").value = config.TmdbPosterSize || "w500";
                         document.getElementById("StrmLibraryPath").value = config.StrmLibraryPath || "";
                         updateLibPaths();
+
+                        // Show Radarr API key and URL
+                        if (config.RadarrApiKey) {
+                            document.getElementById("smRadarrKey").textContent = config.RadarrApiKey;
+                        }
+                        var host = window.location.origin;
+                        document.getElementById("smRadarrUrl").textContent = host + "/SourceManager/radarr";
                     });
                 });
 

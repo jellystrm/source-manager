@@ -1,6 +1,6 @@
 name: "Source Manager"
 guid: "b0e976c7-b9e6-4a30-93d9-0a7858c6dd96"
-version: "1.0.4.0"
+version: "1.0.5.0"
 targetAbi: "10.11.0.0"
 framework: "net9.0"
 owner: "jellystrm"
@@ -23,6 +23,17 @@ artifacts:
   - "SQLitePCLRaw.batteries_v2.dll"
   - "runtimes/**"
 changelog: |
+  ## 1.0.5.0
+  - Adds Jellyseerr integration: Source Manager now exposes a Radarr-compatible
+    API at /SourceManager/radarr so Jellyseerr can point to it instead of a real
+    Radarr instance. When an admin approves a request in Jellyseerr, it is
+    forwarded directly to Source Manager.
+  - Adds RadarrApiKey plugin setting (auto-generated, shown in dashboard page).
+  - Adds Jellyseerr Integration section in the plugin configuration page with
+    copy buttons for the Radarr URL and API key, and a 5-step setup guide.
+  - Radarr-compat endpoints: system/status, qualityProfile, rootfolder, tag,
+    queue, movie/lookup, movie (CRUD), command.
+
   ## 1.0.4.0
   - Adds .strm file writing: admins can supply a stream URL when approving a
     request; the plugin writes a .strm file under the configured library path.
