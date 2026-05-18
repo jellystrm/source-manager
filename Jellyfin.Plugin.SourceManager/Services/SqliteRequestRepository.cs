@@ -67,7 +67,8 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
                     requested_at,
                     updated_at,
                     jellyfin_item_id,
-                    reject_reason)
+                    reject_reason,
+                    stream_url)
                 VALUES (
                     $request_id,
                     $user_id,
@@ -81,6 +82,7 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
                     $status,
                     $requested_at,
                     $updated_at,
+                    NULL,
                     NULL,
                     NULL);
                 """;
@@ -142,7 +144,7 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
         return await GetByIdCoreAsync(connection, requestId, cancellationToken).ConfigureAwait(false);
     }
 
-    public Task<MediaRequestRecord?> SetProcessingAsync(string requestId, CancellationToken cancellationToken)
+    public Task<MediaRequestRecord?> SetProcessingAsync(string requestId, string? streamUrl, CancellationToken cancellationToken)
         => UpdateStatusAsync(
             requestId,
             RequestStatus.Processing,
@@ -150,6 +152,7 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
             jellyfinItemId: null,
             rejectReason: null,
             clearRejectReason: true,
+            streamUrl: streamUrl,
             cancellationToken);
 
     public Task<MediaRequestRecord?> SetRejectedAsync(string requestId, string? reason, CancellationToken cancellationToken)
@@ -160,6 +163,7 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
             jellyfinItemId: null,
             rejectReason: reason,
             clearRejectReason: false,
+            streamUrl: null,
             cancellationToken);
 
     public Task<MediaRequestRecord?> SetReadyAsync(string requestId, string jellyfinItemId, CancellationToken cancellationToken)
@@ -170,6 +174,7 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
             jellyfinItemId,
             rejectReason: null,
             clearRejectReason: true,
+            streamUrl: null,
             cancellationToken);
 
     public async Task<IReadOnlyList<MediaRequestRecord>> GetProcessingByContentAsync(
@@ -218,7 +223,8 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
             requested_at,
             updated_at,
             jellyfin_item_id,
-            reject_reason
+            reject_reason,
+            stream_url
         FROM media_requests
         """;
 
@@ -229,6 +235,7 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
         string? jellyfinItemId,
         string? rejectReason,
         bool clearRejectReason,
+        string? streamUrl,
         CancellationToken cancellationToken)
     {
         await EnsureInitializedAsync(cancellationToken).ConfigureAwait(false);
@@ -244,7 +251,8 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
                 SET status = $status,
                     updated_at = $updated_at,
                     jellyfin_item_id = COALESCE($jellyfin_item_id, jellyfin_item_id),
-                    reject_reason = CASE WHEN $clear_reject_reason THEN NULL ELSE $reject_reason END
+                    reject_reason = CASE WHEN $clear_reject_reason THEN NULL ELSE $reject_reason END,
+                    stream_url = COALESCE($stream_url, stream_url)
                 WHERE request_id = $request_id
                   AND ($required_current_status IS NULL OR status = $required_current_status)
                 """;
@@ -255,6 +263,7 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
             AddParameter(command, "$jellyfin_item_id", jellyfinItemId);
             AddParameter(command, "$reject_reason", rejectReason);
             AddParameter(command, "$clear_reject_reason", clearRejectReason);
+            AddParameter(command, "$stream_url", streamUrl);
             var rows = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
             if (rows == 0)
             {
@@ -285,8 +294,9 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
             }
 
             await using var connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
-            await using var command = connection.CreateCommand();
-            command.CommandText = """
+
+            await using var createCmd = connection.CreateCommand();
+            createCmd.CommandText = """
                 CREATE TABLE IF NOT EXISTS media_requests (
                     request_id TEXT PRIMARY KEY,
                     user_id TEXT NOT NULL,
@@ -301,7 +311,8 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
                     requested_at INTEGER NOT NULL,
                     updated_at INTEGER NOT NULL,
                     jellyfin_item_id TEXT,
-                    reject_reason TEXT
+                    reject_reason TEXT,
+                    stream_url TEXT
                 );
 
                 CREATE UNIQUE INDEX IF NOT EXISTS ux_media_requests_active
@@ -317,7 +328,19 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
                 CREATE INDEX IF NOT EXISTS ix_media_requests_processing_lookup
                     ON media_requests(status, tmdb_id, media_type, season_number, episode_number);
                 """;
-            await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            await createCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+
+            // Migration: add stream_url column to existing databases that predate this column.
+            await using var checkCmd = connection.CreateCommand();
+            checkCmd.CommandText = "SELECT COUNT(*) FROM pragma_table_info('media_requests') WHERE name = 'stream_url'";
+            var count = (long)(await checkCmd.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false))!;
+            if (count == 0)
+            {
+                await using var alterCmd = connection.CreateCommand();
+                alterCmd.CommandText = "ALTER TABLE media_requests ADD COLUMN stream_url TEXT";
+                await alterCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            }
+
             _initialized = true;
         }
         finally
@@ -377,6 +400,7 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
             var posterUrlIsNull = await reader.IsDBNullAsync(8, cancellationToken).ConfigureAwait(false);
             var jellyfinItemIdIsNull = await reader.IsDBNullAsync(12, cancellationToken).ConfigureAwait(false);
             var rejectReasonIsNull = await reader.IsDBNullAsync(13, cancellationToken).ConfigureAwait(false);
+            var streamUrlIsNull = await reader.IsDBNullAsync(14, cancellationToken).ConfigureAwait(false);
 
             results.Add(new MediaRequestRecord(
                 reader.GetString(0),
@@ -392,7 +416,8 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
                 reader.GetInt64(10),
                 reader.GetInt64(11),
                 jellyfinItemIdIsNull ? null : reader.GetString(12),
-                rejectReasonIsNull ? null : reader.GetString(13)));
+                rejectReasonIsNull ? null : reader.GetString(13),
+                streamUrlIsNull ? null : reader.GetString(14)));
         }
 
         return results;

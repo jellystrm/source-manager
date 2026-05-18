@@ -13,6 +13,7 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         serviceCollection.AddSingleton<IRequestRepository, SqliteRequestRepository>();
         serviceCollection.AddSingleton<RequestEventBroker>();
         serviceCollection.AddSingleton<LibraryRequestMatcher>();
+        serviceCollection.AddSingleton<StrmWriterService>();
         serviceCollection.AddSingleton<RequestWorkflowService>();
         serviceCollection.AddHostedService<LibraryMonitorService>();
     }

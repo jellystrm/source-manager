@@ -130,9 +130,12 @@ public sealed class SourceManagerController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MediaRequestDto>> ApproveRequest(
         [FromRoute, Required] string requestId,
+        [FromBody] ApproveRequestDto? body,
         CancellationToken cancellationToken)
     {
-        var updated = await _requestWorkflowService.ApproveAsync(requestId, cancellationToken).ConfigureAwait(false);
+        var updated = await _requestWorkflowService
+            .ApproveAsync(requestId, body?.StreamUrl, cancellationToken)
+            .ConfigureAwait(false);
         var latest = updated.LastOrDefault();
         return latest is null ? NotFound() : Ok(latest.ToDto());
     }

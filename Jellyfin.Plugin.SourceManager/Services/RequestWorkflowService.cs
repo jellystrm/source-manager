@@ -20,19 +20,22 @@ public sealed class RequestWorkflowService
     private readonly LibraryRequestMatcher _libraryRequestMatcher;
     private readonly ILibraryManager _libraryManager;
     private readonly RequestEventBroker _eventBroker;
+    private readonly StrmWriterService _strmWriter;
 
     public RequestWorkflowService(
         IRequestRepository repository,
         TmdbMetadataService metadataService,
         LibraryRequestMatcher libraryRequestMatcher,
         ILibraryManager libraryManager,
-        RequestEventBroker eventBroker)
+        RequestEventBroker eventBroker,
+        StrmWriterService strmWriter)
     {
         _repository = repository;
         _metadataService = metadataService;
         _libraryRequestMatcher = libraryRequestMatcher;
         _libraryManager = libraryManager;
         _eventBroker = eventBroker;
+        _strmWriter = strmWriter;
     }
 
     public async Task<MediaRequestRecord> CreateRequestAsync(CreateRequestDto request, CancellationToken cancellationToken)
@@ -72,16 +75,34 @@ public sealed class RequestWorkflowService
         return _repository.GetByStatusAsync(normalizedStatus, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<MediaRequestRecord>> ApproveAsync(string requestId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<MediaRequestRecord>> ApproveAsync(
+        string requestId,
+        string? streamUrl,
+        CancellationToken cancellationToken)
     {
-        var processing = await _repository.SetProcessingAsync(requestId, cancellationToken).ConfigureAwait(false);
+        var normalizedUrl = string.IsNullOrWhiteSpace(streamUrl) ? null : streamUrl.Trim();
+
+        var processing = await _repository
+            .SetProcessingAsync(requestId, normalizedUrl, cancellationToken)
+            .ConfigureAwait(false);
+
         if (processing is null)
         {
             return Array.Empty<MediaRequestRecord>();
         }
 
         Publish(processing);
-        var refreshed = await _libraryRequestMatcher.RefreshRequestAsync(processing, _libraryManager, cancellationToken).ConfigureAwait(false);
+
+        // Write .strm file when a stream URL is supplied by the admin.
+        if (!string.IsNullOrWhiteSpace(normalizedUrl))
+        {
+            _strmWriter.WriteStrmFile(processing, normalizedUrl);
+        }
+
+        var refreshed = await _libraryRequestMatcher
+            .RefreshRequestAsync(processing, _libraryManager, cancellationToken)
+            .ConfigureAwait(false);
+
         if (refreshed is null || string.Equals(refreshed.Status, processing.Status, StringComparison.OrdinalIgnoreCase))
         {
             return new[] { processing };
@@ -97,6 +118,12 @@ public sealed class RequestWorkflowService
         if (rejected is not null)
         {
             Publish(rejected);
+
+            // Clean up any .strm file that was written when the request was approved.
+            if (!string.IsNullOrWhiteSpace(rejected.StreamUrl))
+            {
+                _strmWriter.DeleteStrmFile(rejected);
+            }
         }
 
         return rejected;
@@ -110,7 +137,10 @@ public sealed class RequestWorkflowService
             return null;
         }
 
-        var refreshed = await _libraryRequestMatcher.RefreshRequestAsync(request, _libraryManager, cancellationToken).ConfigureAwait(false);
+        var refreshed = await _libraryRequestMatcher
+            .RefreshRequestAsync(request, _libraryManager, cancellationToken)
+            .ConfigureAwait(false);
+
         if (refreshed is not null && !string.Equals(refreshed.Status, request.Status, StringComparison.OrdinalIgnoreCase))
         {
             Publish(refreshed);

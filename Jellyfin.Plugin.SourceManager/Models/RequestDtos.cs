@@ -11,6 +11,8 @@ public sealed record CreateRequestDto(
 
 public sealed record RejectRequestDto(string? Reason);
 
+public sealed record ApproveRequestDto(string? StreamUrl);
+
 public sealed record MediaRequestDto(
     string RequestId,
     string TmdbId,
@@ -22,7 +24,8 @@ public sealed record MediaRequestDto(
     string? JellyfinItemId,
     int? SeasonNumber,
     int? EpisodeNumber,
-    string? RejectReason);
+    string? RejectReason,
+    string? StreamUrl);
 
 public sealed record RequestMetadata(string Title, string? PosterUrl);
 
@@ -40,7 +43,8 @@ public sealed record MediaRequestRecord(
     long RequestedAt,
     long UpdatedAt,
     string? JellyfinItemId,
-    string? RejectReason)
+    string? RejectReason,
+    string? StreamUrl)
 {
     public MediaRequestDto ToDto()
         => new(
@@ -54,5 +58,6 @@ public sealed record MediaRequestRecord(
             JellyfinItemId,
             SeasonNumber,
             EpisodeNumber,
-            RejectReason);
+            RejectReason,
+            StreamUrl);
 }

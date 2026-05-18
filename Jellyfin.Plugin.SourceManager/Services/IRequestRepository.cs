@@ -1,5 +1,4 @@
 using Jellyfin.Plugin.SourceManager.Models;
-using MediaBrowser.Controller.Entities;
 
 namespace Jellyfin.Plugin.SourceManager.Services;
 
@@ -21,7 +20,7 @@ public interface IRequestRepository
 
     Task<MediaRequestRecord?> GetByIdAsync(string requestId, CancellationToken cancellationToken);
 
-    Task<MediaRequestRecord?> SetProcessingAsync(string requestId, CancellationToken cancellationToken);
+    Task<MediaRequestRecord?> SetProcessingAsync(string requestId, string? streamUrl, CancellationToken cancellationToken);
 
     Task<MediaRequestRecord?> SetRejectedAsync(string requestId, string? reason, CancellationToken cancellationToken);
 
