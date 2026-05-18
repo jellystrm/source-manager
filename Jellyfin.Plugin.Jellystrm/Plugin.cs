@@ -1,12 +1,14 @@
 using System;
+using System.Collections.Generic;
 using Jellyfin.Plugin.Jellystrm.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
+using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
 
 namespace Jellyfin.Plugin.Jellystrm;
 
-public class Plugin : BasePlugin<PluginConfiguration>
+public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
 {
     public Plugin(IApplicationPaths applicationPaths, IXmlSerializer xmlSerializer)
         : base(applicationPaths, xmlSerializer)
@@ -23,4 +25,13 @@ public class Plugin : BasePlugin<PluginConfiguration>
     public override string Description => "Resolves Jellystrm client requests and manages Jellyfin stream sources.";
 
     public override string ConfigurationFileName => "Jellyfin.Plugin.Jellystrm.xml";
+
+    public IEnumerable<PluginPageInfo> GetPages()
+    {
+        yield return new PluginPageInfo
+        {
+            Name = Name,
+            EmbeddedResourcePath = $"{GetType().Namespace}.Pages.Jellystrm.html"
+        };
+    }
 }

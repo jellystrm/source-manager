@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <AssemblyName>Jellyfin.Plugin.Jellystrm</AssemblyName>
     <RootNamespace>Jellyfin.Plugin.Jellystrm</RootNamespace>
-    <Version>1.0.0.0</Version>
+    <Version>1.0.1.0</Version>
     <Authors>Jellystrm</Authors>
     <RepositoryUrl>https://github.com/jellystrm/source-manager</RepositoryUrl>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
@@ -16,6 +16,11 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.Data.Sqlite" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Pages\**\*" />
+    <EmbeddedResource Include="Pages\**\*" />
   </ItemGroup>
 
   <ItemGroup Condition="Exists('..\..\MediaBrowser.Controller\MediaBrowser.Controller.csproj')">
