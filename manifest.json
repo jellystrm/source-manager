@@ -8,6 +8,14 @@
     "category": "General",
     "versions": [
       {
+        "version": "1.0.15.0",
+        "changelog": "- See the full changelog at [GitHub](https://github.com/jellystrm/source-manager/releases/tag/1.0.15.0)\n",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/jellystrm/source-manager/releases/download/1.0.15.0/source-manager-1.0.15.0.zip",
+        "checksum": "58925046404a8ed3dcb11e74f4721521",
+        "timestamp": "2026-05-18T15:28:31Z"
+      },
+      {
         "version": "1.0.14.0",
         "changelog": "- See the full changelog at [GitHub](https://github.com/jellystrm/source-manager/releases/tag/1.0.14.0)\n",
         "targetAbi": "10.11.0.0",
