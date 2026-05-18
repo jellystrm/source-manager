@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssemblyName>Jellyfin.Plugin.Jellystrm</AssemblyName>
+    <RootNamespace>Jellyfin.Plugin.Jellystrm</RootNamespace>
+    <Version>1.0.0.0</Version>
+    <Authors>Jellystrm</Authors>
+    <RepositoryUrl>https://github.com/jellystrm/source-manager</RepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <AnalysisMode>None</AnalysisMode>
+    <NoWarn>$(NoWarn);CS1591;SA1600;SA1601;SA1633</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+  </ItemGroup>
+
+  <ItemGroup Condition="Exists('..\..\MediaBrowser.Controller\MediaBrowser.Controller.csproj')">
+    <ProjectReference Include="..\..\Jellyfin.Data\Jellyfin.Data.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\..\MediaBrowser.Controller\MediaBrowser.Controller.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\..\MediaBrowser.Model\MediaBrowser.Model.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\..\MediaBrowser.Common\MediaBrowser.Common.csproj" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup Condition="!Exists('..\..\MediaBrowser.Controller\MediaBrowser.Controller.csproj')">
+    <PackageReference Include="Jellyfin.Controller">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Jellyfin.Model">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Jellyfin.Common">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Jellyfin.Data">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

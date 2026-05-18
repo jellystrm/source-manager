@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Jellyfin.Common" Version="10.11.8" />
+    <PackageVersion Include="Jellyfin.Controller" Version="10.11.8" />
+    <PackageVersion Include="Jellyfin.Data" Version="10.11.8" />
+    <PackageVersion Include="Jellyfin.Model" Version="10.11.8" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.1" />
+  </ItemGroup>
+</Project>
