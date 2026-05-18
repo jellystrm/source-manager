@@ -12,8 +12,8 @@
         "changelog": "- See the full changelog at [GitHub](https://github.com/jellystrm/source-manager/releases/tag/1.0.2.0)\n",
         "targetAbi": "10.11.0.0",
         "sourceUrl": "https://github.com/jellystrm/source-manager/releases/download/1.0.2.0/source-manager-1.0.2.0.zip",
-        "checksum": "970c71440f434aa26b1dbfd3e74fecb2",
-        "timestamp": "2026-05-18T08:03:18Z"
+        "checksum": "248b718577cdc8224280e927da9e33be",
+        "timestamp": "2026-05-18T08:04:29Z"
       },
       {
         "version": "1.0.1.0",
