@@ -12,6 +12,7 @@ public interface IRequestRepository
         int? episodeNumber,
         string requestKey,
         RequestMetadata metadata,
+        string? tvdbId,
         CancellationToken cancellationToken);
 
     Task<IReadOnlyList<MediaRequestRecord>> GetByUserAsync(string userId, CancellationToken cancellationToken);

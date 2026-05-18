@@ -34,6 +34,7 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
         int? episodeNumber,
         string requestKey,
         RequestMetadata metadata,
+        string? tvdbId,
         CancellationToken cancellationToken)
     {
         await EnsureInitializedAsync(cancellationToken).ConfigureAwait(false);
@@ -68,7 +69,8 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
                     updated_at,
                     jellyfin_item_id,
                     reject_reason,
-                    stream_url)
+                    stream_url,
+                    tvdb_id)
                 VALUES (
                     $request_id,
                     $user_id,
@@ -84,7 +86,8 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
                     $updated_at,
                     NULL,
                     NULL,
-                    NULL);
+                    NULL,
+                    $tvdb_id);
                 """;
             AddParameter(command, "$request_id", requestId);
             AddParameter(command, "$user_id", userId);
@@ -98,6 +101,7 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
             AddParameter(command, "$status", RequestStatus.Pending);
             AddParameter(command, "$requested_at", now);
             AddParameter(command, "$updated_at", now);
+            AddParameter(command, "$tvdb_id", tvdbId);
             await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
 
             return (await GetByIdCoreAsync(connection, requestId, cancellationToken).ConfigureAwait(false))!;
@@ -249,7 +253,8 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
             updated_at,
             jellyfin_item_id,
             reject_reason,
-            stream_url
+            stream_url,
+            tvdb_id
         FROM media_requests
         """;
 
@@ -337,7 +342,8 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
                     updated_at INTEGER NOT NULL,
                     jellyfin_item_id TEXT,
                     reject_reason TEXT,
-                    stream_url TEXT
+                    stream_url TEXT,
+                    tvdb_id TEXT
                 );
 
                 CREATE UNIQUE INDEX IF NOT EXISTS ux_media_requests_active
@@ -363,6 +369,18 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
             {
                 await using var alterCmd = connection.CreateCommand();
                 alterCmd.CommandText = "ALTER TABLE media_requests ADD COLUMN stream_url TEXT";
+                await alterCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            // Migration: add tvdb_id column. Series now store the real TMDB id in
+            // tmdb_id; tvdb_id holds the Jellyseerr/Sonarr TVDB id for lookup/delete.
+            await using var tvdbCheckCmd = connection.CreateCommand();
+            tvdbCheckCmd.CommandText = "SELECT COUNT(*) FROM pragma_table_info('media_requests') WHERE name = 'tvdb_id'";
+            var tvdbCount = (long)(await tvdbCheckCmd.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false))!;
+            if (tvdbCount == 0)
+            {
+                await using var alterCmd = connection.CreateCommand();
+                alterCmd.CommandText = "ALTER TABLE media_requests ADD COLUMN tvdb_id TEXT";
                 await alterCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
             }
 
@@ -426,6 +444,7 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
             var jellyfinItemIdIsNull = await reader.IsDBNullAsync(12, cancellationToken).ConfigureAwait(false);
             var rejectReasonIsNull = await reader.IsDBNullAsync(13, cancellationToken).ConfigureAwait(false);
             var streamUrlIsNull = await reader.IsDBNullAsync(14, cancellationToken).ConfigureAwait(false);
+            var tvdbIdIsNull = await reader.IsDBNullAsync(15, cancellationToken).ConfigureAwait(false);
 
             results.Add(new MediaRequestRecord(
                 reader.GetString(0),
@@ -442,7 +461,8 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
                 reader.GetInt64(11),
                 jellyfinItemIdIsNull ? null : reader.GetString(12),
                 rejectReasonIsNull ? null : reader.GetString(13),
-                streamUrlIsNull ? null : reader.GetString(14)));
+                streamUrlIsNull ? null : reader.GetString(14),
+                tvdbIdIsNull ? null : reader.GetString(15)));
         }
 
         return results;

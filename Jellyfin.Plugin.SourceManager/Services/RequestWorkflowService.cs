@@ -57,6 +57,7 @@ public sealed class RequestWorkflowService
                 request.EpisodeNumber,
                 requestKey,
                 metadata,
+                tvdbId: null,
                 cancellationToken)
             .ConfigureAwait(false);
     }

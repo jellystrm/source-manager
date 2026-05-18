@@ -32,15 +32,18 @@ public sealed class SonarrCompatController : ControllerBase
 
     private readonly IRequestRepository _repository;
     private readonly LibraryPathService _libraryPaths;
+    private readonly TmdbMetadataService _metadataService;
     private readonly ILogger<SonarrCompatController> _logger;
 
     public SonarrCompatController(
         IRequestRepository repository,
         LibraryPathService libraryPaths,
+        TmdbMetadataService metadataService,
         ILogger<SonarrCompatController> logger)
     {
         _repository = repository;
         _libraryPaths = libraryPaths;
+        _metadataService = metadataService;
         _logger = logger;
     }
 
@@ -258,18 +261,28 @@ public sealed class SonarrCompatController : ControllerBase
             "Sonarr compat: creating request for series tvdb:{TvdbId} ({Title})",
             body.TvdbId, body.Title);
 
-        var metadata = new RequestMetadata(body.Title, null);
-        var requestKey = RequestWorkflowService.BuildRequestKey(tvdbIdStr, RequestMediaType.Series, null, null);
+        var lookup = await _metadataService
+            .GetSeriesMetadataByTvdbIdAsync(body.TvdbId, cancellationToken)
+            .ConfigureAwait(false);
+
+        // Use the real TMDB id as the primary identifier so resolvers and the
+        // Jellyfin library matcher work by TMDB. tvdb_id retains the Sonarr id
+        // for Jellyseerr's TVDB-keyed lookup/delete. If TMDB has no mapping,
+        // fall back to the TVDB id + Sonarr-supplied title.
+        var primaryId = lookup?.TmdbId ?? tvdbIdStr;
+        var metadata = lookup?.Metadata ?? new RequestMetadata(body.Title, null);
+        var requestKey = RequestWorkflowService.BuildRequestKey(primaryId, RequestMediaType.Series, null, null);
 
         var record = await _repository
             .CreateOrGetActiveAsync(
                 JellyseerrUserId,
-                tvdbIdStr,
+                primaryId,
                 RequestMediaType.Series,
                 null,
                 null,
                 requestKey,
                 metadata,
+                tvdbId: tvdbIdStr,
                 cancellationToken)
             .ConfigureAwait(false);
 
@@ -376,13 +389,19 @@ public sealed class SonarrCompatController : ControllerBase
             .ConfigureAwait(false);
 
         return all.FirstOrDefault(r =>
-            string.Equals(r.TmdbId, tvdbIdStr, StringComparison.Ordinal) &&
-            string.Equals(r.MediaType, RequestMediaType.Series, StringComparison.OrdinalIgnoreCase));
+            string.Equals(r.MediaType, RequestMediaType.Series, StringComparison.OrdinalIgnoreCase) &&
+            (string.Equals(r.TvdbId, tvdbIdStr, StringComparison.Ordinal) ||
+             // Backward-compat: pre-migration series records stored the TVDB id
+             // in tmdb_id with tvdb_id NULL.
+             (r.TvdbId is null && string.Equals(r.TmdbId, tvdbIdStr, StringComparison.Ordinal))));
     }
 
     private static SonarrSeries ToSonarrSeries(MediaRequestRecord r)
     {
-        var tvdbId = int.TryParse(r.TmdbId, NumberStyles.None, CultureInfo.InvariantCulture, out var id)
+        // Jellyseerr expects the Sonarr id to be the TVDB id. Prefer the
+        // dedicated tvdb_id column; fall back to tmdb_id for pre-migration records.
+        var tvdbSource = !string.IsNullOrWhiteSpace(r.TvdbId) ? r.TvdbId : r.TmdbId;
+        var tvdbId = int.TryParse(tvdbSource, NumberStyles.None, CultureInfo.InvariantCulture, out var id)
             ? id : 0;
 
         var hasFile = string.Equals(r.Status, RequestStatus.Ready, StringComparison.OrdinalIgnoreCase)

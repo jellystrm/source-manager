@@ -1,6 +1,6 @@
 name: "Source Manager"
 guid: "b0e976c7-b9e6-4a30-93d9-0a7858c6dd96"
-version: "1.0.8.0"
+version: "1.0.9.0"
 targetAbi: "10.11.0.0"
 framework: "net9.0"
 owner: "jellystrm"
@@ -23,6 +23,21 @@ artifacts:
   - "SQLitePCLRaw.batteries_v2.dll"
   - "runtimes/**"
 changelog: |
+  ## 1.0.9.0
+  - Series now use the real TMDB id as the primary identifier instead of the
+    TVDB id. On Sonarr add, the plugin resolves the TVDB id to a TMDB id via
+    TMDB's /find endpoint (free, no TVDB API key) and stores the TMDB id in
+    tmdb_id; the TVDB id is kept in a new tvdb_id column for Jellyseerr's
+    TVDB-keyed lookup/delete.
+  - Series requests now get a real poster and canonical title from TMDB.
+  - LibraryRequestMatcher now matches series to Jellyfin items by TMDB id
+    (previously series were keyed by TVDB id and never matched, leaving
+    requests stuck in processing).
+  - Adds tvdb_id column with automatic migration; pre-migration series
+    records remain resolvable via a backward-compat lookup.
+  - If TMDB has no TVDB mapping, the request is still created with the
+    Sonarr-supplied title (no poster).
+
   ## 1.0.8.0
   - Replaces single StrmLibraryPath with MovieLibraryPath + ShowLibraryPath.
   - Adds LibraryPathService: auto-discovers library paths from Jellyfin virtual

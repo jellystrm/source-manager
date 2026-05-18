@@ -29,6 +29,8 @@ public sealed record MediaRequestDto(
 
 public sealed record RequestMetadata(string Title, string? PosterUrl);
 
+public sealed record SeriesTmdbLookup(string TmdbId, RequestMetadata Metadata);
+
 public sealed record MediaRequestRecord(
     string RequestId,
     string UserId,
@@ -44,7 +46,8 @@ public sealed record MediaRequestRecord(
     long UpdatedAt,
     string? JellyfinItemId,
     string? RejectReason,
-    string? StreamUrl)
+    string? StreamUrl,
+    string? TvdbId)
 {
     public MediaRequestDto ToDto()
         => new(

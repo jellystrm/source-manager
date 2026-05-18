@@ -111,6 +111,24 @@ public sealed class TmdbMetadataService
         }
     }
 
+    public async Task<SeriesTmdbLookup?> GetSeriesMetadataByTvdbIdAsync(int tvdbId, CancellationToken cancellationToken)
+    {
+        var result = await GetFromTmdbAsync<TmdbFindResult>(
+            $"find/{tvdbId.ToString(CultureInfo.InvariantCulture)}?external_source=tvdb_id",
+            cancellationToken).ConfigureAwait(false);
+        var series = result?.TvResults?.FirstOrDefault();
+        if (series?.Id is null)
+        {
+            return null;
+        }
+
+        var title = FirstNonEmpty(series.Name, series.OriginalName, $"TVDB series {tvdbId}");
+        var metadata = new RequestMetadata(title, GetPosterUrl(series.PosterPath));
+        return new SeriesTmdbLookup(
+            series.Id.Value.ToString(CultureInfo.InvariantCulture),
+            metadata);
+    }
+
     private static string? GetPosterUrl(string? posterPath)
     {
         if (string.IsNullOrWhiteSpace(posterPath))
@@ -134,9 +152,13 @@ public sealed class TmdbMetadataService
     private sealed record TmdbSeries(
         [property: JsonPropertyName("name")] string? Name,
         [property: JsonPropertyName("original_name")] string? OriginalName,
-        [property: JsonPropertyName("poster_path")] string? PosterPath);
+        [property: JsonPropertyName("poster_path")] string? PosterPath,
+        [property: JsonPropertyName("id")] long? Id = null);
 
     private sealed record TmdbEpisode(
         [property: JsonPropertyName("name")] string? Name,
         [property: JsonPropertyName("still_path")] string? StillPath);
+
+    private sealed record TmdbFindResult(
+        [property: JsonPropertyName("tv_results")] IReadOnlyList<TmdbSeries>? TvResults);
 }

@@ -317,6 +317,7 @@ public sealed class RadarrCompatController : ControllerBase
                 null,
                 requestKey,
                 metadata,
+                tvdbId: null,
                 cancellationToken)
             .ConfigureAwait(false);
 
