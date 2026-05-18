@@ -31,13 +31,16 @@ public sealed class SonarrCompatController : ControllerBase
     private const string JellyseerrUserId = "00000000000000000000000000000001";
 
     private readonly IRequestRepository _repository;
+    private readonly LibraryPathService _libraryPaths;
     private readonly ILogger<SonarrCompatController> _logger;
 
     public SonarrCompatController(
         IRequestRepository repository,
+        LibraryPathService libraryPaths,
         ILogger<SonarrCompatController> logger)
     {
         _repository = repository;
+        _libraryPaths = libraryPaths;
         _logger = logger;
     }
 
@@ -123,7 +126,7 @@ public sealed class SonarrCompatController : ControllerBase
     {
         if (!IsAuthorized()) return Unauthorized401();
 
-        var path = Plugin.Instance?.Configuration.StrmLibraryPath ?? "/data/strm";
+        var path = _libraryPaths.GetShowPath() ?? "/data/strm/shows";
         return Ok(new[]
         {
             new SonarrRootFolder(RootFolderId, path, FreeSpace: 0, UnmappedFolders: Array.Empty<object>())

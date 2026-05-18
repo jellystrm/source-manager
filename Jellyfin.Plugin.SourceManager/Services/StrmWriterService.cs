@@ -7,103 +7,116 @@ namespace Jellyfin.Plugin.SourceManager.Services;
 
 public sealed class StrmWriterService
 {
+    private readonly LibraryPathService _libraryPaths;
     private readonly ILogger<StrmWriterService> _logger;
 
-    public StrmWriterService(ILogger<StrmWriterService> logger)
+    public StrmWriterService(LibraryPathService libraryPaths, ILogger<StrmWriterService> logger)
     {
+        _libraryPaths = libraryPaths;
         _logger = logger;
     }
 
     /// <summary>
-    /// Writes a .strm file for the given request under the configured library path.
-    /// Returns the full path of the created file, or null if StrmLibraryPath is not configured.
-    /// </summary>
-    /// <remarks>
-    /// Layout written:
-    ///   movies/  → add as Jellyfin "Movies" library
-    ///   shows/   → add as Jellyfin "TV Shows" library
+    /// Writes a .strm file into the appropriate Jellyfin library folder.
+    /// Path is discovered from the live Jellyfin virtual folder list;
+    /// falls back to the explicit override paths in plugin config.
     ///
-    /// Episode files use the per-season sub-folder pattern that Jellyfin expects.
-    /// </remarks>
+    /// Folder conventions (Jellyfin-compatible):
+    ///   Movies  → {moviePath}/{Title}/{Title}.strm
+    ///   Series  → {showPath}/{Title}/{Title}.strm
+    ///   Episode → {showPath}/{Title}/Season {NN}/{Title} - S{NN}E{NN}.strm
+    /// </summary>
     public string? WriteStrmFile(MediaRequestRecord request, string streamUrl)
     {
-        var basePath = Plugin.Instance?.Configuration.StrmLibraryPath;
-        if (string.IsNullOrWhiteSpace(basePath))
+        var libraryPath = GetLibraryPath(request.MediaType);
+        if (libraryPath is null)
         {
             _logger.LogWarning(
-                "StrmLibraryPath is not configured — skipping .strm creation for request {RequestId}",
-                request.RequestId);
+                "No library path available for {MediaType} — skipping .strm for request {RequestId}",
+                request.MediaType, request.RequestId);
             return null;
         }
 
         try
         {
-            var filePath = BuildFilePath(basePath, request);
-            var directory = Path.GetDirectoryName(filePath)!;
-            Directory.CreateDirectory(directory);
+            var filePath = BuildFilePath(libraryPath, request);
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
             File.WriteAllText(filePath, streamUrl, Encoding.UTF8);
+
             _logger.LogInformation(
-                "Created .strm file at {Path} for request {RequestId}",
-                filePath,
-                request.RequestId);
+                "Created .strm at {Path} for request {RequestId}",
+                filePath, request.RequestId);
+
             return filePath;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to write .strm file for request {RequestId}", request.RequestId);
+            _logger.LogError(ex, "Failed to write .strm for request {RequestId}", request.RequestId);
             return null;
         }
     }
 
-    /// <summary>
-    /// Deletes the .strm file previously created for this request, if it still exists.
-    /// </summary>
+    /// <summary>Deletes the .strm file previously written for this request.</summary>
     public void DeleteStrmFile(MediaRequestRecord request)
     {
-        var basePath = Plugin.Instance?.Configuration.StrmLibraryPath;
-        if (string.IsNullOrWhiteSpace(basePath))
-        {
-            return;
-        }
+        var libraryPath = GetLibraryPath(request.MediaType);
+        if (libraryPath is null) return;
 
         try
         {
-            var filePath = BuildFilePath(basePath, request);
-            if (File.Exists(filePath))
+            var filePath = BuildFilePath(libraryPath, request);
+            if (!File.Exists(filePath)) return;
+
+            File.Delete(filePath);
+
+            // Remove the parent folder if it is now empty (per-movie folders).
+            var dir = Path.GetDirectoryName(filePath)!;
+            if (Directory.Exists(dir) && !Directory.EnumerateFileSystemEntries(dir).Any())
             {
-                File.Delete(filePath);
-                _logger.LogInformation(
-                    "Deleted .strm file at {Path} for request {RequestId}",
-                    filePath,
-                    request.RequestId);
+                Directory.Delete(dir);
             }
+
+            _logger.LogInformation(
+                "Deleted .strm at {Path} for request {RequestId}",
+                filePath, request.RequestId);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to delete .strm file for request {RequestId}", request.RequestId);
+            _logger.LogWarning(ex, "Failed to delete .strm for request {RequestId}", request.RequestId);
         }
     }
 
-    private static string BuildFilePath(string basePath, MediaRequestRecord request)
+    // -----------------------------------------------------------------------
+
+    private string? GetLibraryPath(string mediaType) =>
+        string.Equals(mediaType, RequestMediaType.Movie, StringComparison.OrdinalIgnoreCase)
+            ? _libraryPaths.GetMoviePath()
+            : _libraryPaths.GetShowPath();
+
+    private static string BuildFilePath(string libraryPath, MediaRequestRecord request)
     {
         var safeName = SanitizeFilename(request.Title);
 
         return request.MediaType switch
         {
+            // Movies/{Title}/{Title}.strm
             RequestMediaType.Movie =>
-                Path.Combine(basePath, "movies", $"{safeName}.strm"),
+                Path.Combine(libraryPath, safeName, $"{safeName}.strm"),
 
+            // Shows/{Title}/{Title}.strm  (series-level placeholder)
             RequestMediaType.Series =>
-                Path.Combine(basePath, "shows", $"{safeName}.strm"),
+                Path.Combine(libraryPath, safeName, $"{safeName}.strm"),
 
+            // Shows/{Title}/Season NN/{Title} - SNNENN.strm
             RequestMediaType.Episode =>
                 Path.Combine(
-                    basePath,
-                    "shows",
+                    libraryPath,
+                    safeName,
                     string.Create(CultureInfo.InvariantCulture, $"Season {request.SeasonNumber!.Value:00}"),
-                    $"{safeName}.strm"),
+                    string.Create(CultureInfo.InvariantCulture,
+                        $"{safeName} - S{request.SeasonNumber!.Value:00}E{request.EpisodeNumber!.Value:00}.strm")),
 
-            _ => Path.Combine(basePath, $"{request.RequestId}.strm")
+            _ => Path.Combine(libraryPath, $"{request.RequestId}.strm")
         };
     }
 

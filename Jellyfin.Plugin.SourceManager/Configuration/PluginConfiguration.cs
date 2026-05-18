@@ -9,10 +9,21 @@ public class PluginConfiguration : BasePluginConfiguration
     public string TmdbPosterSize { get; set; } = "w500";
 
     /// <summary>
-    /// Root directory where .strm files are written.
-    /// Movies go to {StrmLibraryPath}/movies/, shows to {StrmLibraryPath}/shows/.
-    /// Add those sub-paths as separate Jellyfin libraries (Movies / TV Shows).
+    /// Override path for the Jellyfin Movies library root.
+    /// Leave blank to auto-discover from Jellyfin virtual folders.
+    /// Example: /media/movies
     /// </summary>
+    public string? MovieLibraryPath { get; set; }
+
+    /// <summary>
+    /// Override path for the Jellyfin TV Shows library root.
+    /// Leave blank to auto-discover from Jellyfin virtual folders.
+    /// Example: /media/shows
+    /// </summary>
+    public string? ShowLibraryPath { get; set; }
+
+    /// <summary>Kept for migration only — no longer used.</summary>
+    [Obsolete("Use MovieLibraryPath / ShowLibraryPath instead.")]
     public string? StrmLibraryPath { get; set; }
 
     /// <summary>

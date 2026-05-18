@@ -265,32 +265,31 @@
                         </div>
                     </div>
 
-                    <!-- STRM -->
+                    <!-- Library paths -->
                     <div class="sm-section">
-                        <div class="sm-section-title">STRM library</div>
+                        <div class="sm-section-title">Library paths</div>
 
                         <div class="sm-info">
-                            When an admin approves a request with a <strong>stream URL</strong>, the plugin writes a <code>.strm</code> file here. Jellyfin scans it automatically and adds the item to the library.
+                            Source Manager writes <code>.strm</code> files directly into the library folders Jellyfin is already scanning.<br>
+                            <strong>Leave blank</strong> to auto-discover from Jellyfin virtual folders. Set only if auto-discovery picks the wrong folder.
                         </div>
 
                         <div class="sm-field">
-                            <label class="sm-label" for="StrmLibraryPath">Library base path</label>
-                            <input id="StrmLibraryPath" name="StrmLibraryPath" type="text" class="sm-input emby-input" is="emby-input" placeholder="/data/strm" />
-                            <div class="sm-hint">Absolute path on the Jellyfin server. Leave blank to disable .strm writing.</div>
+                            <label class="sm-label" for="MovieLibraryPath">Movies library path <span style="color:#555;font-weight:400">(optional override)</span></label>
+                            <input id="MovieLibraryPath" name="MovieLibraryPath" type="text" class="sm-input emby-input" is="emby-input" placeholder="auto-detected" />
+                            <div class="sm-hint">Root folder of your Jellyfin Movies library, e.g. <code>/media/movies</code></div>
                         </div>
 
-                        <div style="margin-top:0.75rem;">
-                            <div class="sm-hint" style="margin-bottom:6px;">Add these sub-paths as Jellyfin libraries:</div>
-                            <div class="sm-lib-row">
-                                <span class="sm-lib-path" id="smPathMovies">/data/strm/movies</span>
-                                <span class="sm-lib-arrow">→</span>
-                                <span class="sm-lib-type">Movies</span>
-                            </div>
-                            <div class="sm-lib-row">
-                                <span class="sm-lib-path" id="smPathShows">/data/strm/shows</span>
-                                <span class="sm-lib-arrow">→</span>
-                                <span class="sm-lib-type">TV Shows</span>
-                            </div>
+                        <div class="sm-field">
+                            <label class="sm-label" for="ShowLibraryPath">TV Shows library path <span style="color:#555;font-weight:400">(optional override)</span></label>
+                            <input id="ShowLibraryPath" name="ShowLibraryPath" type="text" class="sm-input emby-input" is="emby-input" placeholder="auto-detected" />
+                            <div class="sm-hint">Root folder of your Jellyfin TV Shows library, e.g. <code>/media/shows</code></div>
+                        </div>
+
+                        <div class="sm-info" style="margin-top:0.5rem;margin-bottom:0;">
+                            Files are written as:<br>
+                            <code>Movies/{Title}/{Title}.strm</code><br>
+                            <code>Shows/{Title}/Season NN/{Title} - SNNENN.strm</code>
                         </div>
                     </div>
 
@@ -390,7 +389,7 @@
                     </div>
 
                     <div class="sm-footer">
-                        <span class="sm-version">v1.0.7.0</span>
+                        <span class="sm-version">v1.0.8.0</span>
                         <button id="smSaveBtn" is="emby-button" type="submit" class="sm-btn raised button-submit emby-button">Save</button>
                     </div>
 
@@ -402,12 +401,6 @@
             (function () {
                 var pluginId = "b0e976c7-b9e6-4a30-93d9-0a7858c6dd96";
 
-                function updateLibPaths() {
-                    var base = document.getElementById("StrmLibraryPath").value.trim().replace(/\/+$/, "") || "/data/strm";
-                    document.getElementById("smPathMovies").textContent = base + "/movies";
-                    document.getElementById("smPathShows").textContent = base + "/shows";
-                }
-
                 window.smCopy = function (elementId) {
                 var text = document.getElementById(elementId).textContent;
                 navigator.clipboard.writeText(text).then(function () {
@@ -416,15 +409,13 @@
                 });
             };
 
-            document.getElementById("StrmLibraryPath").addEventListener("input", updateLibPaths);
-
                 document.getElementById("SourceManagerConfigPage").addEventListener("pageshow", function () {
                     if (typeof ApiClient === "undefined") { return; }
                     ApiClient.getPluginConfiguration(pluginId).then(function (config) {
                         document.getElementById("TmdbApiKey").value = config.TmdbApiKey || "";
                         document.getElementById("TmdbPosterSize").value = config.TmdbPosterSize || "w500";
-                        document.getElementById("StrmLibraryPath").value = config.StrmLibraryPath || "";
-                        updateLibPaths();
+                        document.getElementById("MovieLibraryPath").value = config.MovieLibraryPath || "";
+                        document.getElementById("ShowLibraryPath").value = config.ShowLibraryPath || "";
                         document.getElementById("EnableAutoResolution").checked = config.EnableAutoResolution !== false;
                         document.getElementById("QBittorrentUrl").value = config.QBittorrentUrl || "";
                         document.getElementById("QBittorrentUsername").value = config.QBittorrentUsername || "admin";
@@ -448,7 +439,8 @@
                     ApiClient.getPluginConfiguration(pluginId).then(function (config) {
                         config.TmdbApiKey = document.getElementById("TmdbApiKey").value.trim() || null;
                         config.TmdbPosterSize = document.getElementById("TmdbPosterSize").value.trim() || "w500";
-                        config.StrmLibraryPath = document.getElementById("StrmLibraryPath").value.trim() || null;
+                        config.MovieLibraryPath = document.getElementById("MovieLibraryPath").value.trim() || null;
+                        config.ShowLibraryPath = document.getElementById("ShowLibraryPath").value.trim() || null;
                         config.EnableAutoResolution = document.getElementById("EnableAutoResolution").checked;
                         config.QBittorrentUrl = document.getElementById("QBittorrentUrl").value.trim() || null;
                         config.QBittorrentUsername = document.getElementById("QBittorrentUsername").value.trim() || "admin";

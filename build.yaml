@@ -1,6 +1,6 @@
 name: "Source Manager"
 guid: "b0e976c7-b9e6-4a30-93d9-0a7858c6dd96"
-version: "1.0.7.0"
+version: "1.0.8.0"
 targetAbi: "10.11.0.0"
 framework: "net9.0"
 owner: "jellystrm"
@@ -23,6 +23,18 @@ artifacts:
   - "SQLitePCLRaw.batteries_v2.dll"
   - "runtimes/**"
 changelog: |
+  ## 1.0.8.0
+  - Replaces single StrmLibraryPath with MovieLibraryPath + ShowLibraryPath.
+  - Adds LibraryPathService: auto-discovers library paths from Jellyfin virtual
+    folders (ILibraryManager.GetVirtualFolders) so .strm files are written
+    directly into the folder Jellyfin is already scanning.
+  - Config overrides take priority; auto-discovery is used when not set.
+  - Radarr rootfolder endpoint now returns the actual Movies library path.
+  - Sonarr rootfolder endpoint now returns the actual TV Shows library path.
+  - StrmWriterService uses per-title subfolders: Movies/{Title}/{Title}.strm,
+    Shows/{Title}/Season NN/{Title} - SNNENN.strm.
+  - SourceResolutionService torrent save path also uses discovered paths.
+
   ## 1.0.7.0
   - Adds automatic source resolution background service (SourceResolutionService).
     Scans processing requests without a stream URL every 60 seconds and tries

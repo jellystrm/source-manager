@@ -16,6 +16,7 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         serviceCollection.AddSingleton<LibraryRequestMatcher>();
         serviceCollection.AddSingleton<StrmWriterService>();
         serviceCollection.AddSingleton<RequestWorkflowService>();
+        serviceCollection.AddSingleton<LibraryPathService>();
         serviceCollection.AddHostedService<LibraryMonitorService>();
 
         // Source resolution

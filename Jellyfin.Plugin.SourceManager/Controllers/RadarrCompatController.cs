@@ -29,15 +29,18 @@ public sealed class RadarrCompatController : ControllerBase
 
     private readonly IRequestRepository _repository;
     private readonly TmdbMetadataService _tmdbService;
+    private readonly LibraryPathService _libraryPaths;
     private readonly ILogger<RadarrCompatController> _logger;
 
     public RadarrCompatController(
         IRequestRepository repository,
         TmdbMetadataService tmdbService,
+        LibraryPathService libraryPaths,
         ILogger<RadarrCompatController> logger)
     {
         _repository = repository;
         _tmdbService = tmdbService;
+        _libraryPaths = libraryPaths;
         _logger = logger;
     }
 
@@ -114,7 +117,7 @@ public sealed class RadarrCompatController : ControllerBase
     {
         if (!IsAuthorized()) return Unauthorized401();
 
-        var path = Plugin.Instance?.Configuration.StrmLibraryPath ?? "/data/strm";
+        var path = _libraryPaths.GetMoviePath() ?? "/data/strm/movies";
         return Ok(new[]
         {
             new RadarrRootFolder(RootFolderId, path, FreeSpace: 0, TotalSpace: 0, UnmappedFolders: Array.Empty<object>())

@@ -19,6 +19,7 @@ public sealed class SourceResolutionService : BackgroundService
 {
     private readonly IRequestRepository _repository;
     private readonly StrmWriterService _strmWriter;
+    private readonly LibraryPathService _libraryPaths;
     private readonly IReadOnlyList<ISourceResolver> _resolvers;
     private readonly QBittorrentClient _qbittorrent;
     private readonly ILogger<SourceResolutionService> _logger;
@@ -26,6 +27,7 @@ public sealed class SourceResolutionService : BackgroundService
     public SourceResolutionService(
         IRequestRepository repository,
         StrmWriterService strmWriter,
+        LibraryPathService libraryPaths,
         KkPhimResolver kkPhim,
         OPhimResolver oPhim,
         YtsResolver yts,
@@ -34,6 +36,7 @@ public sealed class SourceResolutionService : BackgroundService
     {
         _repository = repository;
         _strmWriter = strmWriter;
+        _libraryPaths = libraryPaths;
         _resolvers = [kkPhim, oPhim, yts];
         _qbittorrent = qbittorrent;
         _logger = logger;
@@ -144,11 +147,8 @@ public sealed class SourceResolutionService : BackgroundService
         }
     }
 
-    private static string GetTorrentSavePath(MediaRequestRecord request)
-    {
-        var basePath = Plugin.Instance?.Configuration.StrmLibraryPath ?? "/data/strm";
-        return string.Equals(request.MediaType, RequestMediaType.Movie, StringComparison.OrdinalIgnoreCase)
-            ? Path.Combine(basePath, "movies")
-            : Path.Combine(basePath, "shows");
-    }
+    private string GetTorrentSavePath(MediaRequestRecord request) =>
+        string.Equals(request.MediaType, RequestMediaType.Movie, StringComparison.OrdinalIgnoreCase)
+            ? (_libraryPaths.GetMoviePath() ?? "/data/strm/movies")
+            : (_libraryPaths.GetShowPath() ?? "/data/strm/shows");
 }
