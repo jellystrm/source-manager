@@ -3,223 +3,301 @@
 <head>
     <title>Source Manager</title>
     <style>
-        /* Scoped cosmetic styles only — no page/background/layout overrides,
-           so the page inherits the active Jellyfin theme and stays inside
-           the dashboard shell. */
-        #SourceManagerConfigPage .sm-copy-row {
+        /* Fully self-contained, all scoped under the page id. No html/body/
+           viewport/background overrides, so it renders correctly whether or
+           not Jellyfin's theme CSS applies, and never fights the dashboard
+           shell (the bug in earlier full-document versions). */
+        #SourceManagerConfigPage .sm-wrap {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem 4rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #ddd;
+        }
+        #SourceManagerConfigPage .sm-h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0 0 .25rem;
+        }
+        #SourceManagerConfigPage .sm-sub { color: #8a8a8a; margin: 0 0 1rem; }
+        #SourceManagerConfigPage .sm-pill {
+            display: inline-block;
+            margin: 0 .35rem .4rem 0;
+            padding: .2rem .7rem;
+            border-radius: 1rem;
+            font-size: .75rem;
+            background: rgba(0, 164, 220, .14);
+            color: #36b9e0;
+        }
+        #SourceManagerConfigPage .sm-card {
+            background: #1c1c1c;
+            border: 1px solid #2e2e2e;
+            border-radius: 10px;
+            padding: 1.1rem 1.25rem;
+            margin: 1rem 0;
+        }
+        #SourceManagerConfigPage .sm-card-t {
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #36b9e0;
+            margin: 0 0 .9rem;
+        }
+        #SourceManagerConfigPage .sm-field { margin-bottom: 1rem; }
+        #SourceManagerConfigPage .sm-field:last-child { margin-bottom: 0; }
+        #SourceManagerConfigPage label.sm-l {
+            display: block;
+            font-size: .82rem;
+            font-weight: 600;
+            color: #cfcfcf;
+            margin-bottom: .35rem;
+        }
+        #SourceManagerConfigPage .sm-opt { color: #777; font-weight: 400; }
+        #SourceManagerConfigPage input.sm-i {
+            width: 100%;
+            box-sizing: border-box;
+            background: #121212;
+            border: 1px solid #3a3a3a;
+            border-radius: 6px;
+            color: #eee;
+            font-size: .9rem;
+            padding: .55rem .7rem;
+            outline: none;
+        }
+        #SourceManagerConfigPage input.sm-i:focus { border-color: #36b9e0; }
+        #SourceManagerConfigPage input.sm-i::placeholder { color: #5a5a5a; }
+        #SourceManagerConfigPage .sm-hint {
+            margin-top: .35rem;
+            font-size: .78rem;
+            color: #7f7f7f;
+        }
+        #SourceManagerConfigPage code {
+            background: #2a2a2a;
+            border-radius: 3px;
+            padding: .05rem .35rem;
+            font-size: .8rem;
+            color: #c9c9c9;
+        }
+        #SourceManagerConfigPage .sm-check {
             display: flex;
             align-items: center;
-            gap: .5em;
-            padding: .5em .75em;
-            margin: .25em 0 .75em;
-            border: 1px solid rgba(255, 255, 255, .12);
-            border-radius: .25em;
-            background: rgba(255, 255, 255, .04);
+            gap: .55rem;
+            font-size: .9rem;
+            color: #cfcfcf;
+            cursor: pointer;
         }
-        #SourceManagerConfigPage .sm-copy-row code {
+        #SourceManagerConfigPage .sm-check input { width: 16px; height: 16px; margin: 0; cursor: pointer; }
+        #SourceManagerConfigPage .sm-note {
+            background: rgba(0, 164, 220, .07);
+            border: 1px solid rgba(0, 164, 220, .2);
+            border-radius: 8px;
+            padding: .7rem .9rem;
+            font-size: .82rem;
+            color: #a9a9a9;
+            margin-bottom: 1rem;
+        }
+        #SourceManagerConfigPage .sm-note strong { color: #36b9e0; }
+        #SourceManagerConfigPage .sm-svc-t {
+            font-size: .9rem;
+            font-weight: 700;
+            color: #eaeaea;
+            margin: 1.1rem 0 .5rem;
+        }
+        #SourceManagerConfigPage .sm-row {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .4rem .6rem;
+            margin: .25rem 0;
+            border: 1px solid #313131;
+            border-radius: 6px;
+            background: #161616;
+        }
+        #SourceManagerConfigPage .sm-row .k {
+            flex-shrink: 0;
+            width: 8.5em;
+            font-size: .8rem;
+            color: #8f8f8f;
+        }
+        #SourceManagerConfigPage .sm-row code {
             flex: 1;
+            background: none;
+            padding: 0;
+            color: #e8e8e8;
             word-break: break-all;
-            font-size: .85em;
+            font-size: .82rem;
         }
+        #SourceManagerConfigPage .sm-cp {
+            flex-shrink: 0;
+            background: #2c2c2c;
+            border: 1px solid #454545;
+            border-radius: 4px;
+            color: #cfcfcf;
+            font-size: .72rem;
+            padding: .2rem .55rem;
+            cursor: pointer;
+        }
+        #SourceManagerConfigPage .sm-cp:hover { background: #383838; color: #fff; }
         #SourceManagerConfigPage .sm-step {
             display: flex;
-            gap: .6em;
-            padding: .35em 0;
-            line-height: 1.45;
+            gap: .6rem;
+            padding: .35rem 0;
+            font-size: .84rem;
+            color: #a9a9a9;
         }
-        #SourceManagerConfigPage .sm-step-num {
+        #SourceManagerConfigPage .sm-step b {
             flex-shrink: 0;
-            width: 1.5em;
-            height: 1.5em;
+            width: 1.4rem;
+            height: 1.4rem;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: .8em;
+            font-size: .72rem;
             font-weight: 700;
-            background: rgba(0, 164, 220, .15);
-            color: #00a4dc;
+            background: rgba(0, 164, 220, .16);
+            color: #36b9e0;
         }
-        #SourceManagerConfigPage .sm-pill {
-            display: inline-block;
-            margin: 0 .3em .4em 0;
-            padding: .15em .65em;
-            border-radius: 1em;
-            font-size: .78em;
-            background: rgba(0, 164, 220, .12);
-            color: #00a4dc;
+        #SourceManagerConfigPage .sm-save {
+            width: 100%;
+            background: #00a4dc;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: .7rem;
+            font-size: .92rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1rem;
         }
-        #SourceManagerConfigPage code {
-            background: rgba(255, 255, 255, .08);
-            border-radius: .2em;
-            padding: .05em .35em;
-        }
-        #SourceManagerConfigPage .sm-jf-row {
-            display: flex;
-            align-items: center;
-            gap: .5em;
-            padding: .35em .5em;
-            margin: .2em 0;
-            border: 1px solid rgba(255, 255, 255, .1);
-            border-radius: .25em;
-            background: rgba(255, 255, 255, .03);
-        }
-        #SourceManagerConfigPage .sm-jf-k {
-            flex-shrink: 0;
-            width: 8.5em;
-            font-size: .82em;
-            opacity: .7;
-        }
-        #SourceManagerConfigPage .sm-jf-row code {
-            flex: 1;
-            word-break: break-all;
-            font-size: .85em;
+        #SourceManagerConfigPage .sm-save:hover { background: #0090c4; }
+        #SourceManagerConfigPage .sm-ver {
+            text-align: center;
+            font-size: .75rem;
+            color: #555;
+            margin-top: .75rem;
         }
     </style>
 </head>
 <body>
-<div id="SourceManagerConfigPage" data-role="page" class="page type-interior pluginConfigurationPage"
-     data-require="emby-input,emby-button,emby-checkbox,emby-select">
+<div id="SourceManagerConfigPage" data-role="page" class="page type-interior pluginConfigurationPage">
     <div data-role="content">
         <div class="content-primary">
+            <div class="sm-wrap">
 
-            <form id="SourceManagerConfigForm" class="esqContent">
-
-                <div class="verticalSection verticalSection-extrabottompadding">
-                    <h2 class="sectionTitle">Source Manager</h2>
-                    <p class="fieldDescription" style="margin-top:-.5em;">
-                        Request workflow &amp; managed .strm stream library.
-                    </p>
-                    <div style="margin-top:.75em;">
-                        <span class="sm-pill">GET /SourceManager/Capabilities</span>
-                        <span class="sm-pill">POST /SourceManager/Request</span>
-                        <span class="sm-pill">SSE /Requests/Events</span>
-                        <span class="sm-pill">Admin approve / reject / refresh</span>
-                    </div>
+                <h1 class="sm-h1">Source Manager</h1>
+                <p class="sm-sub">Request workflow &amp; managed .strm stream library</p>
+                <div>
+                    <span class="sm-pill">GET /SourceManager/Capabilities</span>
+                    <span class="sm-pill">POST /SourceManager/Request</span>
+                    <span class="sm-pill">SSE /Requests/Events</span>
+                    <span class="sm-pill">Admin approve / reject / refresh</span>
                 </div>
 
-                <!-- TMDB -->
-                <div class="verticalSection">
-                    <h2 class="sectionTitle">TMDB</h2>
+                <form id="SourceManagerConfigForm">
 
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="TmdbApiKey">API key (optional)</label>
-                        <input is="emby-input" type="text" id="TmdbApiKey" name="TmdbApiKey"
-                               autocomplete="off" />
-                        <div class="fieldDescription">Leave blank to use the built-in key. Override if you hit TMDB rate limits.</div>
+                    <div class="sm-card">
+                        <div class="sm-card-t">TMDB</div>
+                        <div class="sm-field">
+                            <label class="sm-l" for="TmdbApiKey">API key <span class="sm-opt">(optional)</span></label>
+                            <input id="TmdbApiKey" type="text" class="sm-i" autocomplete="off" placeholder="Leave blank to use the built-in key" />
+                            <div class="sm-hint">Override if you hit TMDB rate limits.</div>
+                        </div>
+                        <div class="sm-field">
+                            <label class="sm-l" for="TmdbPosterSize">Poster size</label>
+                            <input id="TmdbPosterSize" type="text" class="sm-i" placeholder="w500" />
+                            <div class="sm-hint">TMDB image width: <code>w185</code> <code>w342</code> <code>w500</code> <code>original</code></div>
+                        </div>
                     </div>
 
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="TmdbPosterSize">Poster size</label>
-                        <input is="emby-input" type="text" id="TmdbPosterSize" name="TmdbPosterSize" />
-                        <div class="fieldDescription">TMDB image width: <code>w185</code> <code>w342</code> <code>w500</code> <code>original</code></div>
-                    </div>
-                </div>
-
-                <!-- Library paths -->
-                <div class="verticalSection">
-                    <h2 class="sectionTitle">Library paths</h2>
-                    <p class="fieldDescription">
-                        Source Manager writes <code>.strm</code> files directly into the library folders
-                        Jellyfin already scans. Leave blank to auto-discover from Jellyfin virtual folders;
-                        set only if auto-discovery picks the wrong folder.
-                    </p>
-
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="MovieLibraryPath">Movies library path (optional override)</label>
-                        <input is="emby-input" type="text" id="MovieLibraryPath" name="MovieLibraryPath" />
-                        <div class="fieldDescription">Root folder of your Jellyfin Movies library, e.g. <code>/media/movies</code></div>
-                    </div>
-
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="ShowLibraryPath">TV Shows library path (optional override)</label>
-                        <input is="emby-input" type="text" id="ShowLibraryPath" name="ShowLibraryPath" />
-                        <div class="fieldDescription">Root folder of your Jellyfin TV Shows library, e.g. <code>/media/shows</code></div>
+                    <div class="sm-card">
+                        <div class="sm-card-t">Library paths</div>
+                        <div class="sm-note">
+                            Writes <code>.strm</code> files directly into the library folders Jellyfin already scans.
+                            <strong>Leave blank</strong> to auto-discover; set only if auto-discovery picks the wrong folder.
+                        </div>
+                        <div class="sm-field">
+                            <label class="sm-l" for="MovieLibraryPath">Movies library path <span class="sm-opt">(optional override)</span></label>
+                            <input id="MovieLibraryPath" type="text" class="sm-i" placeholder="auto-detected" />
+                            <div class="sm-hint">e.g. <code>/media/movies</code></div>
+                        </div>
+                        <div class="sm-field">
+                            <label class="sm-l" for="ShowLibraryPath">TV Shows library path <span class="sm-opt">(optional override)</span></label>
+                            <input id="ShowLibraryPath" type="text" class="sm-i" placeholder="auto-detected" />
+                            <div class="sm-hint">e.g. <code>/media/shows</code></div>
+                        </div>
+                        <div class="sm-hint">
+                            Files: <code>Movies/{Title}/{Title}.strm</code> ·
+                            <code>Shows/{Title}/Season NN/{Title} - SNNENN.strm</code>
+                        </div>
                     </div>
 
-                    <p class="fieldDescription">
-                        Files are written as
-                        <code>Movies/{Title}/{Title}.strm</code> and
-                        <code>Shows/{Title}/Season NN/{Title} - SNNENN.strm</code>.
-                    </p>
-                </div>
-
-                <!-- Auto Source Resolution -->
-                <div class="verticalSection">
-                    <h2 class="sectionTitle">Auto source resolution</h2>
-                    <p class="fieldDescription">
-                        Khi Jellyseerr approve một request, Source Manager tự tìm stream theo thứ tự:
-                        <strong>KKPhim</strong> → <strong>OPhim</strong> (m3u8 → .strm) →
-                        <strong>YTS</strong> (torrent → qBittorrent).
-                    </p>
-
-                    <label class="emby-checkbox-label">
-                        <input is="emby-checkbox" type="checkbox" id="EnableAutoResolution" name="EnableAutoResolution" />
-                        <span>Enable auto resolution</span>
-                    </label>
-
-                    <div class="inputContainer" style="margin-top:1em;">
-                        <label class="inputLabel inputLabelUnfocused" for="QBittorrentUrl">qBittorrent URL (optional)</label>
-                        <input is="emby-input" type="text" id="QBittorrentUrl" name="QBittorrentUrl" />
-                        <div class="fieldDescription">Leave blank to disable torrent fallback. e.g. <code>http://localhost:8080</code></div>
+                    <div class="sm-card">
+                        <div class="sm-card-t">Auto source resolution</div>
+                        <div class="sm-note">
+                            Khi Jellyseerr approve một request, Source Manager tự tìm stream theo thứ tự:
+                            <strong>KKPhim</strong> → <strong>OPhim</strong> (m3u8 → .strm) →
+                            <strong>YTS</strong> (torrent → qBittorrent).
+                        </div>
+                        <div class="sm-field">
+                            <label class="sm-check">
+                                <input id="EnableAutoResolution" type="checkbox" />
+                                <span>Enable auto resolution</span>
+                            </label>
+                        </div>
+                        <div class="sm-field">
+                            <label class="sm-l" for="QBittorrentUrl">qBittorrent URL <span class="sm-opt">(optional)</span></label>
+                            <input id="QBittorrentUrl" type="text" class="sm-i" placeholder="http://localhost:8080" />
+                            <div class="sm-hint">Leave blank to disable torrent fallback.</div>
+                        </div>
+                        <div class="sm-field">
+                            <label class="sm-l" for="QBittorrentUsername">qBittorrent username</label>
+                            <input id="QBittorrentUsername" type="text" class="sm-i" placeholder="admin" />
+                        </div>
+                        <div class="sm-field">
+                            <label class="sm-l" for="QBittorrentPassword">qBittorrent password</label>
+                            <input id="QBittorrentPassword" type="password" class="sm-i" autocomplete="off" />
+                        </div>
                     </div>
 
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="QBittorrentUsername">qBittorrent username</label>
-                        <input is="emby-input" type="text" id="QBittorrentUsername" name="QBittorrentUsername" />
+                    <div class="sm-card">
+                        <div class="sm-card-t">Jellyseerr integration</div>
+                        <div class="sm-note">
+                            Form Jellyseerr tách <strong>Hostname / Port / URL Base</strong> riêng.
+                            Điền đúng từng dòng dưới đây — <strong>đừng</strong> nhét cả host:port/path vào ô Hostname.
+                        </div>
+
+                        <div class="sm-svc-t">Radarr — Movies</div>
+                        <div class="sm-row"><span class="k">Hostname or IP</span><code id="smR_host">…</code><button type="button" class="sm-cp" data-copy="smR_host">Copy</button></div>
+                        <div class="sm-row"><span class="k">Port</span><code id="smR_port">…</code><button type="button" class="sm-cp" data-copy="smR_port">Copy</button></div>
+                        <div class="sm-row"><span class="k">Use SSL</span><code id="smR_ssl">…</code></div>
+                        <div class="sm-row"><span class="k">URL Base</span><code id="smR_base">/SourceManager/radarr</code><button type="button" class="sm-cp" data-copy="smR_base">Copy</button></div>
+                        <div class="sm-row"><span class="k">API Key</span><code id="smR_key">loading…</code><button type="button" class="sm-cp" data-copy="smR_key">Copy</button></div>
+
+                        <div class="sm-svc-t">Sonarr — TV Series</div>
+                        <div class="sm-row"><span class="k">Hostname or IP</span><code id="smS_host">…</code><button type="button" class="sm-cp" data-copy="smS_host">Copy</button></div>
+                        <div class="sm-row"><span class="k">Port</span><code id="smS_port">…</code><button type="button" class="sm-cp" data-copy="smS_port">Copy</button></div>
+                        <div class="sm-row"><span class="k">Use SSL</span><code id="smS_ssl">…</code></div>
+                        <div class="sm-row"><span class="k">URL Base</span><code id="smS_base">/SourceManager/sonarr</code><button type="button" class="sm-cp" data-copy="smS_base">Copy</button></div>
+                        <div class="sm-row"><span class="k">Language Profile</span><code>Any</code></div>
+                        <div class="sm-row"><span class="k">API Key</span><code id="smS_key">loading…</code><button type="button" class="sm-cp" data-copy="smS_key">Copy</button></div>
+
+                        <div class="sm-svc-t">Cách cài trong Jellyseerr</div>
+                        <div class="sm-step"><b>1</b><div>Settings → Services → Radarr → <strong>Add Radarr Server</strong></div></div>
+                        <div class="sm-step"><b>2</b><div>Điền <strong>Hostname / Port / URL Base / API Key</strong> đúng các giá trị ở trên · Use SSL tắt</div></div>
+                        <div class="sm-step"><b>3</b><div><strong>Test Connection</strong> → Quality Profile <strong>Source Manager</strong> · Root Folder thư mục <strong>movies</strong> → Save</div></div>
+                        <div class="sm-step"><b>4</b><div>Lặp lại với Sonarr (URL Base <code>/SourceManager/sonarr</code>, Language Profile <strong>Any</strong>, Root Folder <strong>shows</strong>)</div></div>
                     </div>
 
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="QBittorrentPassword">qBittorrent password</label>
-                        <input is="emby-input" type="password" id="QBittorrentPassword" name="QBittorrentPassword"
-                               autocomplete="off" />
-                    </div>
-                </div>
+                    <button id="smSave" type="submit" class="sm-save">Save</button>
+                    <div class="sm-ver">Source Manager v1.0.14.0</div>
 
-                <!-- Jellyseerr Integration -->
-                <div class="verticalSection">
-                    <h2 class="sectionTitle">Jellyseerr integration</h2>
-                    <p class="fieldDescription">
-                        Thêm Source Manager như một <strong>Radarr</strong> (phim) và
-                        <strong>Sonarr</strong> (series) instance trong Jellyseerr. Khi admin approve,
-                        Jellyseerr gửi thẳng vào Source Manager thay vì Radarr/Sonarr thật.
-                    </p>
-
-                    <p class="fieldDescription" style="margin-bottom:.5em;">
-                        Form Jellyseerr tách <strong>Hostname / Port / URL Base</strong> riêng —
-                        điền đúng từng dòng dưới đây, <strong>đừng</strong> nhét cả host:port/path vào ô Hostname.
-                    </p>
-
-                    <h3 class="checkboxListLabel" style="margin-top:1em;">Radarr — Movies</h3>
-                    <div class="sm-jf-row"><span class="sm-jf-k">Hostname or IP</span><code id="smR_host">…</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smR_host">Copy</button></div>
-                    <div class="sm-jf-row"><span class="sm-jf-k">Port</span><code id="smR_port">…</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smR_port">Copy</button></div>
-                    <div class="sm-jf-row"><span class="sm-jf-k">Use SSL</span><code id="smR_ssl">…</code></div>
-                    <div class="sm-jf-row"><span class="sm-jf-k">URL Base</span><code id="smR_base">/SourceManager/radarr</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smR_base">Copy</button></div>
-                    <div class="sm-jf-row"><span class="sm-jf-k">API Key</span><code id="smR_key">loading…</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smR_key">Copy</button></div>
-
-                    <h3 class="checkboxListLabel" style="margin-top:1.25em;">Sonarr — TV Series</h3>
-                    <div class="sm-jf-row"><span class="sm-jf-k">Hostname or IP</span><code id="smS_host">…</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smS_host">Copy</button></div>
-                    <div class="sm-jf-row"><span class="sm-jf-k">Port</span><code id="smS_port">…</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smS_port">Copy</button></div>
-                    <div class="sm-jf-row"><span class="sm-jf-k">Use SSL</span><code id="smS_ssl">…</code></div>
-                    <div class="sm-jf-row"><span class="sm-jf-k">URL Base</span><code id="smS_base">/SourceManager/sonarr</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smS_base">Copy</button></div>
-                    <div class="sm-jf-row"><span class="sm-jf-k">Language Profile</span><code>Any</code></div>
-                    <div class="sm-jf-row"><span class="sm-jf-k">API Key</span><code id="smS_key">loading…</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smS_key">Copy</button></div>
-
-                    <h3 class="checkboxListLabel" style="margin-top:1.25em;">Cách cài trong Jellyseerr</h3>
-                    <div class="sm-step"><div class="sm-step-num">1</div><div>Settings → Services → Radarr → <strong>Add Radarr Server</strong></div></div>
-                    <div class="sm-step"><div class="sm-step-num">2</div><div>Điền <strong>Hostname / Port / URL Base / API Key</strong> đúng các giá trị ở trên · Use SSL tắt</div></div>
-                    <div class="sm-step"><div class="sm-step-num">3</div><div><strong>Test Connection</strong> → Quality Profile <strong>Source Manager</strong> · Root Folder thư mục <strong>movies</strong> → Save</div></div>
-                    <div class="sm-step"><div class="sm-step-num">4</div><div>Lặp lại với Sonarr (URL Base <code>/SourceManager/sonarr</code>, Language Profile <strong>Any</strong>, Root Folder <strong>shows</strong>)</div></div>
-                </div>
-
-                <div class="verticalSection">
-                    <button is="emby-button" type="submit" class="raised button-submit block">
-                        <span>Save</span>
-                    </button>
-                    <p class="fieldDescription" style="text-align:center;margin-top:.75em;">Source Manager v1.0.13.0</p>
-                </div>
-
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -228,20 +306,22 @@
             var pluginId = "b0e976c7-b9e6-4a30-93d9-0a7858c6dd96";
             var page = document.getElementById("SourceManagerConfigPage");
 
-            function copyText(id, btn) {
-                var text = document.getElementById(id).textContent;
-                navigator.clipboard.writeText(text).then(function () {
-                    var label = btn.querySelector("span") || btn;
-                    var old = label.textContent;
-                    label.textContent = "Copied!";
-                    setTimeout(function () { label.textContent = old; }, 1500);
-                });
-            }
-
             page.addEventListener("click", function (e) {
                 var btn = e.target.closest("[data-copy]");
-                if (btn) { copyText(btn.getAttribute("data-copy"), btn); }
+                if (!btn) { return; }
+                var el = document.getElementById(btn.getAttribute("data-copy"));
+                if (!el) { return; }
+                navigator.clipboard.writeText(el.textContent).then(function () {
+                    var old = btn.textContent;
+                    btn.textContent = "Copied!";
+                    setTimeout(function () { btn.textContent = old; }, 1500);
+                });
             });
+
+            function setText(id, val) {
+                var el = page.querySelector("#" + id);
+                if (el) { el.textContent = val; }
+            }
 
             page.addEventListener("pageshow", function () {
                 if (typeof ApiClient === "undefined") { return; }
@@ -257,16 +337,11 @@
 
                     var loc = window.location;
                     var isHttps = loc.protocol === "https:";
-                    var hostname = loc.hostname;
                     var port = loc.port || (isHttps ? "443" : "80");
-                    function setText(id, val) {
-                        var el = page.querySelector("#" + id);
-                        if (el) { el.textContent = val; }
-                    }
-                    setText("smR_host", hostname);
+                    setText("smR_host", loc.hostname);
                     setText("smR_port", port);
                     setText("smR_ssl", isHttps ? "On (HTTPS)" : "Off");
-                    setText("smS_host", hostname);
+                    setText("smS_host", loc.hostname);
                     setText("smS_port", port);
                     setText("smS_ssl", isHttps ? "On (HTTPS)" : "Off");
                     if (config.RadarrApiKey) { setText("smR_key", config.RadarrApiKey); }
