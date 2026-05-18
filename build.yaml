@@ -1,6 +1,6 @@
 name: "Source Manager"
 guid: "b0e976c7-b9e6-4a30-93d9-0a7858c6dd96"
-version: "1.0.9.0"
+version: "1.0.10.0"
 targetAbi: "10.11.0.0"
 framework: "net9.0"
 owner: "jellystrm"
@@ -17,12 +17,15 @@ description: >
 artifacts:
   - "Jellyfin.Plugin.SourceManager.dll"
   - "Jellyfin.Plugin.SourceManager.deps.json"
-  - "Microsoft.Data.Sqlite.dll"
-  - "SQLitePCLRaw.core.dll"
-  - "SQLitePCLRaw.provider.e_sqlite3.dll"
-  - "SQLitePCLRaw.batteries_v2.dll"
-  - "runtimes/**"
 changelog: |
+  ## 1.0.10.0
+  - Fixes plugin showing as "Malfunctioned": the package no longer bundles
+    Microsoft.Data.Sqlite / SQLitePCLRaw or the native runtimes/ tree.
+    Jellyfin's assembly scanner tried to load the native e_sqlite3 libs as
+    managed assemblies and threw BadImageFormatException, disabling the
+    whole plugin. The plugin now compiles against Microsoft.Data.Sqlite
+    (ExcludeAssets=runtime) and uses the copy Jellyfin already loads.
+
   ## 1.0.9.0
   - Series now use the real TMDB id as the primary identifier instead of the
     TVDB id. On Sonarr add, the plugin resolves the TVDB id to a TMDB id via

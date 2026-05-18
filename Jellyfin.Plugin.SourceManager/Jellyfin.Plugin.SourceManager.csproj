@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <AssemblyName>Jellyfin.Plugin.SourceManager</AssemblyName>
     <RootNamespace>Jellyfin.Plugin.SourceManager</RootNamespace>
-    <Version>1.0.9.0</Version>
+    <Version>1.0.10.0</Version>
     <Authors>Jellystrm</Authors>
     <RepositoryUrl>https://github.com/jellystrm/source-manager</RepositoryUrl>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
@@ -15,8 +15,24 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <!-- Jellyfin already loads Microsoft.Data.Sqlite + SQLitePCLRaw and inits
+         the provider process-wide. Compile against it but do NOT ship it:
+         bundling the native runtimes/ tree makes Jellyfin's assembly scanner
+         throw BadImageFormatException on the native e_sqlite3 libs and
+         disable the whole plugin ("Malfunctioned"). -->
+    <PackageReference Include="Microsoft.Data.Sqlite">
+      <ExcludeAssets>runtime;native</ExcludeAssets>
+    </PackageReference>
   </ItemGroup>
+
+  <!-- Belt-and-suspenders: even with ExcludeAssets, the SQLitePCLRaw native
+       bundle can stage runtimes/<rid>/native/e_sqlite3.* into publish output.
+       Jellyfin's plugin loader scans every file and throws
+       BadImageFormatException on these native libs, disabling the plugin.
+       Jellyfin already provides SQLite at runtime, so strip the tree. -->
+  <Target Name="StripNativeRuntimes" AfterTargets="Publish">
+    <RemoveDir Directories="$(PublishDir)runtimes" />
+  </Target>
 
   <ItemGroup>
     <None Remove="Pages\**\*" />
