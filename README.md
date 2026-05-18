@@ -50,21 +50,21 @@ https://raw.githubusercontent.com/jellystrm/source-manager/main/manifest.json
 
 That URL loads this plugin catalog. Each manifest entry points Jellyfin to the matching GitHub release ZIP, for example `jellystrm-1.0.0.0.zip`.
 
-Use `build.yaml` with JPRM to produce the plugin ZIP and repository manifest:
+Use the `Release` GitHub Actions workflow to publish a version. It builds the plugin ZIP, updates `manifest.json` with the generated checksum, pushes the manifest to `main`, and creates or updates the matching GitHub release asset.
 
-```bash
-python -m jprm plugin build --output ./build
+Run it from GitHub Actions with a version such as:
+
+```text
+1.0.0.0
 ```
 
-`manifest.template.json` is only a hand-editable placeholder. Prefer the JPRM-generated manifest for releases.
-
-The repository also includes Streamyfin-style release helpers:
+For local verification before running CI/CD:
 
 ```bash
 make release VERSION=1.0.0.0
 ```
 
-This restores, builds, publishes, zips the plugin into `dist/`, and updates `manifest.json` with the generated checksum.
+This restores, builds, publishes, zips the plugin into `dist/`, and updates local `manifest.json` with the generated checksum.
 
 ## Repository Layout
 
