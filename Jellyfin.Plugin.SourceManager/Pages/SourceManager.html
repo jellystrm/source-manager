@@ -294,6 +294,37 @@
                         </div>
                     </div>
 
+                    <!-- Auto Source Resolution -->
+                    <div class="sm-section">
+                        <div class="sm-section-title">Auto Source Resolution</div>
+
+                        <div class="sm-info">
+                            Khi Jellyseerr approve một request, Source Manager tự động tìm stream theo thứ tự:<br>
+                            <strong>KKPhim</strong> → <strong>OPhim</strong> (m3u8 → .strm) → <strong>YTS</strong> (torrent → qBittorrent)
+                        </div>
+
+                        <div class="sm-field" style="display:flex;align-items:center;gap:10px;">
+                            <input id="EnableAutoResolution" name="EnableAutoResolution" type="checkbox" style="width:auto;margin:0;" />
+                            <label class="sm-label" for="EnableAutoResolution" style="margin:0;">Enable auto resolution</label>
+                        </div>
+
+                        <div class="sm-field">
+                            <label class="sm-label" for="QBittorrentUrl">qBittorrent URL <span style="color:#555;font-weight:400">(optional)</span></label>
+                            <input id="QBittorrentUrl" name="QBittorrentUrl" type="text" class="sm-input emby-input" is="emby-input" placeholder="http://localhost:8080" />
+                            <div class="sm-hint">Leave blank to disable torrent fallback.</div>
+                        </div>
+
+                        <div class="sm-field">
+                            <label class="sm-label" for="QBittorrentUsername">qBittorrent username</label>
+                            <input id="QBittorrentUsername" name="QBittorrentUsername" type="text" class="sm-input emby-input" is="emby-input" placeholder="admin" />
+                        </div>
+
+                        <div class="sm-field">
+                            <label class="sm-label" for="QBittorrentPassword">qBittorrent password</label>
+                            <input id="QBittorrentPassword" name="QBittorrentPassword" type="password" class="sm-input emby-input" is="emby-input" autocomplete="off" />
+                        </div>
+                    </div>
+
                     <!-- Jellyseerr Integration -->
                     <div class="sm-section">
                         <div class="sm-section-title">Jellyseerr Integration</div>
@@ -359,7 +390,7 @@
                     </div>
 
                     <div class="sm-footer">
-                        <span class="sm-version">v1.0.6.0</span>
+                        <span class="sm-version">v1.0.7.0</span>
                         <button id="smSaveBtn" is="emby-button" type="submit" class="sm-btn raised button-submit emby-button">Save</button>
                     </div>
 
@@ -394,6 +425,10 @@
                         document.getElementById("TmdbPosterSize").value = config.TmdbPosterSize || "w500";
                         document.getElementById("StrmLibraryPath").value = config.StrmLibraryPath || "";
                         updateLibPaths();
+                        document.getElementById("EnableAutoResolution").checked = config.EnableAutoResolution !== false;
+                        document.getElementById("QBittorrentUrl").value = config.QBittorrentUrl || "";
+                        document.getElementById("QBittorrentUsername").value = config.QBittorrentUsername || "admin";
+                        document.getElementById("QBittorrentPassword").value = config.QBittorrentPassword || "";
 
                         var host = window.location.origin;
                         if (config.RadarrApiKey) {
@@ -414,6 +449,10 @@
                         config.TmdbApiKey = document.getElementById("TmdbApiKey").value.trim() || null;
                         config.TmdbPosterSize = document.getElementById("TmdbPosterSize").value.trim() || "w500";
                         config.StrmLibraryPath = document.getElementById("StrmLibraryPath").value.trim() || null;
+                        config.EnableAutoResolution = document.getElementById("EnableAutoResolution").checked;
+                        config.QBittorrentUrl = document.getElementById("QBittorrentUrl").value.trim() || null;
+                        config.QBittorrentUsername = document.getElementById("QBittorrentUsername").value.trim() || "admin";
+                        config.QBittorrentPassword = document.getElementById("QBittorrentPassword").value || null;
                         ApiClient.updatePluginConfiguration(pluginId, config).then(function () {
                             Dashboard.processPluginConfigurationUpdateResult();
                         });

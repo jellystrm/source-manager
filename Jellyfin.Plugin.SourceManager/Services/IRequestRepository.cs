@@ -32,4 +32,6 @@ public interface IRequestRepository
         int? seasonNumber,
         int? episodeNumber,
         CancellationToken cancellationToken);
+
+    Task UpdateStreamUrlAsync(string requestId, string streamUrl, CancellationToken cancellationToken);
 }

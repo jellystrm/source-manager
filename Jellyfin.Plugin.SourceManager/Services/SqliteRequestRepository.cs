@@ -203,6 +203,31 @@ public sealed class SqliteRequestRepository : IRequestRepository, IDisposable
         return await QueryAsync(command, cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task UpdateStreamUrlAsync(string requestId, string streamUrl, CancellationToken cancellationToken)
+    {
+        await EnsureInitializedAsync(cancellationToken).ConfigureAwait(false);
+        await _databaseLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await using var connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
+            await using var command = connection.CreateCommand();
+            command.CommandText = """
+                UPDATE media_requests
+                SET stream_url = $stream_url,
+                    updated_at = $updated_at
+                WHERE request_id = $request_id
+                """;
+            AddParameter(command, "$request_id", requestId);
+            AddParameter(command, "$stream_url", streamUrl);
+            AddParameter(command, "$updated_at", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _databaseLock.Release();
+        }
+    }
+
     public void Dispose()
     {
         _databaseLock.Dispose();
