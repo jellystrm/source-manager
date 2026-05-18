@@ -54,6 +54,27 @@
             border-radius: .2em;
             padding: .05em .35em;
         }
+        #SourceManagerConfigPage .sm-jf-row {
+            display: flex;
+            align-items: center;
+            gap: .5em;
+            padding: .35em .5em;
+            margin: .2em 0;
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: .25em;
+            background: rgba(255, 255, 255, .03);
+        }
+        #SourceManagerConfigPage .sm-jf-k {
+            flex-shrink: 0;
+            width: 8.5em;
+            font-size: .82em;
+            opacity: .7;
+        }
+        #SourceManagerConfigPage .sm-jf-row code {
+            flex: 1;
+            word-break: break-all;
+            font-size: .85em;
+        }
     </style>
 </head>
 <body>
@@ -164,43 +185,38 @@
                         Jellyseerr gửi thẳng vào Source Manager thay vì Radarr/Sonarr thật.
                     </p>
 
+                    <p class="fieldDescription" style="margin-bottom:.5em;">
+                        Form Jellyseerr tách <strong>Hostname / Port / URL Base</strong> riêng —
+                        điền đúng từng dòng dưới đây, <strong>đừng</strong> nhét cả host:port/path vào ô Hostname.
+                    </p>
+
                     <h3 class="checkboxListLabel" style="margin-top:1em;">Radarr — Movies</h3>
-                    <div class="fieldDescription">URL</div>
-                    <div class="sm-copy-row">
-                        <code id="smRadarrUrl">http://&lt;jellyfin-host&gt;:8096/SourceManager/radarr</code>
-                        <button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smRadarrUrl">Copy</button>
-                    </div>
-                    <div class="fieldDescription">API key</div>
-                    <div class="sm-copy-row">
-                        <code id="smRadarrKey">loading…</code>
-                        <button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smRadarrKey">Copy</button>
-                    </div>
+                    <div class="sm-jf-row"><span class="sm-jf-k">Hostname or IP</span><code id="smR_host">…</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smR_host">Copy</button></div>
+                    <div class="sm-jf-row"><span class="sm-jf-k">Port</span><code id="smR_port">…</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smR_port">Copy</button></div>
+                    <div class="sm-jf-row"><span class="sm-jf-k">Use SSL</span><code id="smR_ssl">…</code></div>
+                    <div class="sm-jf-row"><span class="sm-jf-k">URL Base</span><code id="smR_base">/SourceManager/radarr</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smR_base">Copy</button></div>
+                    <div class="sm-jf-row"><span class="sm-jf-k">API Key</span><code id="smR_key">loading…</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smR_key">Copy</button></div>
 
                     <h3 class="checkboxListLabel" style="margin-top:1.25em;">Sonarr — TV Series</h3>
-                    <div class="fieldDescription">URL</div>
-                    <div class="sm-copy-row">
-                        <code id="smSonarrUrl">http://&lt;jellyfin-host&gt;:8096/SourceManager/sonarr</code>
-                        <button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smSonarrUrl">Copy</button>
-                    </div>
-                    <div class="fieldDescription">API key</div>
-                    <div class="sm-copy-row">
-                        <code id="smSonarrKey">loading…</code>
-                        <button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smSonarrKey">Copy</button>
-                    </div>
+                    <div class="sm-jf-row"><span class="sm-jf-k">Hostname or IP</span><code id="smS_host">…</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smS_host">Copy</button></div>
+                    <div class="sm-jf-row"><span class="sm-jf-k">Port</span><code id="smS_port">…</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smS_port">Copy</button></div>
+                    <div class="sm-jf-row"><span class="sm-jf-k">Use SSL</span><code id="smS_ssl">…</code></div>
+                    <div class="sm-jf-row"><span class="sm-jf-k">URL Base</span><code id="smS_base">/SourceManager/sonarr</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smS_base">Copy</button></div>
+                    <div class="sm-jf-row"><span class="sm-jf-k">Language Profile</span><code>Any</code></div>
+                    <div class="sm-jf-row"><span class="sm-jf-k">API Key</span><code id="smS_key">loading…</code><button type="button" is="emby-button" class="raised sm-copy-btn" data-copy="smS_key">Copy</button></div>
 
                     <h3 class="checkboxListLabel" style="margin-top:1.25em;">Cách cài trong Jellyseerr</h3>
-                    <div class="sm-step"><div class="sm-step-num">1</div><div>Settings → Services → Radarr → <strong>Add Radarr Server</strong> → dán Radarr URL và API key ở trên</div></div>
-                    <div class="sm-step"><div class="sm-step-num">2</div><div>Quality Profile → <strong>Source Manager</strong> · Root Folder → thư mục <strong>movies</strong></div></div>
-                    <div class="sm-step"><div class="sm-step-num">3</div><div>Settings → Services → Sonarr → <strong>Add Sonarr Server</strong> → dán Sonarr URL và API key ở trên</div></div>
-                    <div class="sm-step"><div class="sm-step-num">4</div><div>Quality Profile → <strong>Source Manager</strong> · Language Profile → <strong>Any</strong> · Root Folder → thư mục <strong>shows</strong></div></div>
-                    <div class="sm-step"><div class="sm-step-num">5</div><div>Test Connection → Save (cả hai)</div></div>
+                    <div class="sm-step"><div class="sm-step-num">1</div><div>Settings → Services → Radarr → <strong>Add Radarr Server</strong></div></div>
+                    <div class="sm-step"><div class="sm-step-num">2</div><div>Điền <strong>Hostname / Port / URL Base / API Key</strong> đúng các giá trị ở trên · Use SSL tắt</div></div>
+                    <div class="sm-step"><div class="sm-step-num">3</div><div><strong>Test Connection</strong> → Quality Profile <strong>Source Manager</strong> · Root Folder thư mục <strong>movies</strong> → Save</div></div>
+                    <div class="sm-step"><div class="sm-step-num">4</div><div>Lặp lại với Sonarr (URL Base <code>/SourceManager/sonarr</code>, Language Profile <strong>Any</strong>, Root Folder <strong>shows</strong>)</div></div>
                 </div>
 
                 <div class="verticalSection">
                     <button is="emby-button" type="submit" class="raised button-submit block">
                         <span>Save</span>
                     </button>
-                    <p class="fieldDescription" style="text-align:center;margin-top:.75em;">Source Manager v1.0.10.0</p>
+                    <p class="fieldDescription" style="text-align:center;margin-top:.75em;">Source Manager v1.0.13.0</p>
                 </div>
 
             </form>
@@ -239,11 +255,22 @@
                     page.querySelector("#QBittorrentUsername").value = config.QBittorrentUsername || "admin";
                     page.querySelector("#QBittorrentPassword").value = config.QBittorrentPassword || "";
 
-                    var host = window.location.origin;
-                    page.querySelector("#smRadarrUrl").textContent = host + "/SourceManager/radarr";
-                    page.querySelector("#smSonarrUrl").textContent = host + "/SourceManager/sonarr";
-                    if (config.RadarrApiKey) { page.querySelector("#smRadarrKey").textContent = config.RadarrApiKey; }
-                    if (config.SonarrApiKey) { page.querySelector("#smSonarrKey").textContent = config.SonarrApiKey; }
+                    var loc = window.location;
+                    var isHttps = loc.protocol === "https:";
+                    var hostname = loc.hostname;
+                    var port = loc.port || (isHttps ? "443" : "80");
+                    function setText(id, val) {
+                        var el = page.querySelector("#" + id);
+                        if (el) { el.textContent = val; }
+                    }
+                    setText("smR_host", hostname);
+                    setText("smR_port", port);
+                    setText("smR_ssl", isHttps ? "On (HTTPS)" : "Off");
+                    setText("smS_host", hostname);
+                    setText("smS_port", port);
+                    setText("smS_ssl", isHttps ? "On (HTTPS)" : "Off");
+                    if (config.RadarrApiKey) { setText("smR_key", config.RadarrApiKey); }
+                    if (config.SonarrApiKey) { setText("smS_key", config.SonarrApiKey); }
                 });
             });
 
